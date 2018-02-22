@@ -1,0 +1,51 @@
+{
+  "name": "cs451-team7",
+  "version": "0.0.0",
+  "license": "UNLICENSED",
+  "description": "A checkers game for CS 451 at Drexel University",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ehegnes/cs451-team7.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ehegnes/cs451-team7/issues"
+  },
+  "homepage": "https://github.com/ehegnes/cs451-team7#README.md",
+  "private": true,
+  "contributors": [
+    {
+      "name": "Aman Agrawal",
+      "email": "aa3539@drexel.edu"
+    },
+    {
+      "name": "Eric Hegnes",
+      "email": "edh45@drexl.edu"
+    },
+    {
+      "name": "Ryan Hassing",
+      "email": "rhh36@drexel.edu"
+    },
+    {
+      "name": "Yongchang Cai",
+      "email": "yc552@drexel.edu"
+    },
+    {
+      "name": "Zara Zahimi",
+      "email": "zz365@drexel.edu"
+    }
+  ],
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "precommit": "standard --fix --verbose | snazzy",
+    "commitmsg": "commitlint -e $GIT_PARAMS"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^6.0.2",
+    "@commitlint/config-conventional": "^6.0.2",
+    "husky": "^0.14.3",
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.3"
+  }
+}

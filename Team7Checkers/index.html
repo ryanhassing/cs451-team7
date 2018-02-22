@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+    <link rel="import" href="sections/joinscreen.html">
+    <link rel="import" href="sections/maingamescreen.html">
+    <link rel="import" href="sections/mainmenuscreen.html">
+    <link rel="import" href="sections/rulesscreen.html">
+
+    <link rel="stylesheet" href="./assets/css/styles.css">
+
+  </head>
+  <body>
+    <h1>CS451 Checkers Application</h1>
+    <!-- All of the Node.js APIs are available in this renderer process. -->
+    <p>Below: jump to sections. Temporary for now </p>
+
+    <li><a id="start-menu" data-section="mainmenuscreen" href="#">mainmenuscreen</a></li>
+    <li><a data-section="maingamescreen" href="#">maingamescreen</a></li>
+    <li><a data-section="joinscreen" href="#">joinscreen</a></li>
+    <li><a data-section="rulesscreen" href="#">rulesscreen</li>
+
+    <div id="wrapper">
+    </div>
+
+
+    <script>window.$ = window.jQuery = require('./assets/js/jquery.min.js');</script>
+    <script>require('./assets/js/menu')</script>
+    <script>require('./assets/js/script.js')</script>
+    <script>require('./renderer.js')</script>
+  </body>
+</html>

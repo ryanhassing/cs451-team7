@@ -1,0 +1,27 @@
+#wrapper section {
+	display: none;
+}
+
+/* We'll convert px to percentages later on, or to some other unit that allows for dynamic resizing*/
+/* Unless we just want a fixed windowed app, then it doesn't matter */
+
+div#board {
+	position: absolute;
+	width: 800px;
+	height: 800px;
+	background-color: rgb(201, 69, 69);
+	overflow: hidden;
+	margin-left: auto;
+	margin-right: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+div#board .box {
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	background-color: rgb(31, 29, 29);
+}
