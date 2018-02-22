@@ -1,12 +1,100 @@
 <template class="section-template">
     <section id="maingamescreen" class="wrapper">
-        <h1>You're in maingamescreen</h1>
-        <hr>
-        <!-- <p>Pretend this paragraph is a checker board</p>         -->
+        <!-- <h1>You're in maingamescreen</h1>
+        <hr> -->
+        
 
-        <div id="board">
-            <div class="boxes"></div>
+        <div class="container">
+            <div class="nav">
+                Left Nav. All the game info goes here
+                <br>
+                <button id="start-menu" class="buttongame" data-section="mainmenuscreen" href="#">Leave Game</button>
+            </div>
+            
+            <div class="main">
+                <div id="board">
+                    <div class="boxes">
+                        <div class="box" id="box0" style="top:0vmin;left:10vmin;"></div>
+                        <div class="box" id="box1" style="top:0vmin;left:30vmin;"></div>
+                        <div class="box" id="box2" style="top:0vmin;left:50vmin;"></div>
+                        <div class="box" id="box3" style="top:0vmin;left:70vmin;"></div>
+                        <div class="box" id="box4" style="top:10vmin;left:0vmin;"></div>
+                        <div class="box" id="box4" style="top:10vmin;left:0vmin;"></div>
+                        <div class="box" id="box5" style="top:10vmin;left:20vmin;"></div>
+                        <div class="box" id="box5" style="top:10vmin;left:20vmin;"></div>
+                        <div class="box" id="box6" style="top:10vmin;left:40vmin;"></div>
+                        <div class="box" id="box6" style="top:10vmin;left:40vmin;"></div>
+                        <div class="box" id="box7" style="top:10vmin;left:60vmin;"></div>
+                        <div class="box" id="box7" style="top:10vmin;left:60vmin;"></div>
+                        <div class="box" id="box8" style="top:20vmin;left:10vmin;"></div>
+                        <div class="box" id="box9" style="top:20vmin;left:30vmin;"></div>
+                        <div class="box" id="box10" style="top:20vmin;left:50vmin;"></div>
+                        <div class="box" id="box11" style="top:20vmin;left:70vmin;"></div>
+                        <div class="box" id="box12" style="top:30vmin;left:0vmin;"></div>
+                        <div class="box" id="box12" style="top:30vmin;left:0vmin;"></div>
+                        <div class="box" id="box13" style="top:30vmin;left:20vmin;"></div>
+                        <div class="box" id="box13" style="top:30vmin;left:20vmin;"></div>
+                        <div class="box" id="box14" style="top:30vmin;left:40vmin;"></div>
+                        <div class="box" id="box14" style="top:30vmin;left:40vmin;"></div>
+                        <div class="box" id="box15" style="top:30vmin;left:60vmin;"></div>
+                        <div class="box" id="box15" style="top:30vmin;left:60vmin;"></div>
+                        <div class="box" id="box16" style="top:40vmin;left:10vmin;"></div>
+                        <div class="box" id="box17" style="top:40vmin;left:30vmin;"></div>
+                        <div class="box" id="box18" style="top:40vmin;left:50vmin;"></div>
+                        <div class="box" id="box19" style="top:40vmin;left:70vmin;"></div>
+                        <div class="box" id="box20" style="top:50vmin;left:0vmin;"></div>
+                        <div class="box" id="box20" style="top:50vmin;left:0vmin;"></div>
+                        <div class="box" id="box21" style="top:50vmin;left:20vmin;"></div>
+                        <div class="box" id="box21" style="top:50vmin;left:20vmin;"></div>
+                        <div class="box" id="box22" style="top:50vmin;left:40vmin;"></div>
+                        <div class="box" id="box22" style="top:50vmin;left:40vmin;"></div>
+                        <div class="box" id="box23" style="top:50vmin;left:60vmin;"></div>
+                        <div class="box" id="box23" style="top:50vmin;left:60vmin;"></div>
+                        <div class="box" id="box24" style="top:60vmin;left:10vmin;"></div>
+                        <div class="box" id="box25" style="top:60vmin;left:30vmin;"></div>
+                        <div class="box" id="box26" style="top:60vmin;left:50vmin;"></div>
+                        <div class="box" id="box27" style="top:60vmin;left:70vmin;"></div>
+                        <div class="box" id="box28" style="top:70vmin;left:0vmin;"></div>
+                        <div class="box" id="box28" style="top:70vmin;left:0vmin;"></div>
+                        <div class="box" id="box29" style="top:70vmin;left:20vmin;"></div>
+                        <div class="box" id="box29" style="top:70vmin;left:20vmin;"></div>
+                        <div class="box" id="box30" style="top:70vmin;left:40vmin;"></div>
+                        <div class="box" id="box30" style="top:70vmin;left:40vmin;"></div>
+                        <div class="box" id="box31" style="top:70vmin;left:60vmin;"></div>
+                        <div class="box" id="box31" style="top:70vmin;left:60vmin;"></div>
+                    </div>
+                    <div class="pieces">
+                        <div class="player1">
+                            <div class='piece' id='p0' style='top:0vmin;left:10vmin;'></div>
+                            <div class='piece' id='p1' style='top:0vmin;left:30vmin;'></div>
+                            <div class='piece' id='p2' style='top:0vmin;left:50vmin;'></div>
+                            <div class='piece' id='p3' style='top:0vmin;left:70vmin;'></div>
+                            <div class='piece' id='p4' style='top:10vmin;left:0vmin;'></div>
+                            <div class='piece' id='p5' style='top:10vmin;left:20vmin;'></div>
+                            <div class='piece' id='p6' style='top:10vmin;left:40vmin;'></div>
+                            <div class='piece' id='p7' style='top:10vmin;left:60vmin;'></div>
+                            <div class='piece' id='p8' style='top:20vmin;left:10vmin;'></div>
+                            <div class='piece' id='p9' style='top:20vmin;left:30vmin;'></div>
+                            <div class='piece' id='p10' style='top:20vmin;left:50vmin;'></div>
+                            <div class='piece' id='p11' style='top:20vmin;left:70vmin;'></div>
+                        </div>
+                        <div class="player2">
+                            <div class='piece' id='p12' style='top:50vmin;left:0vmin;'></div>
+                            <div class='piece' id='p13' style='top:50vmin;left:20vmin;'></div>
+                            <div class='piece' id='p14' style='top:50vmin;left:40vmin;'></div>
+                            <div class='piece' id='p15' style='top:50vmin;left:60vmin;'></div>
+                            <div class='piece' id='p16' style='top:60vmin;left:10vmin;'></div>
+                            <div class='piece' id='p17' style='top:60vmin;left:30vmin;'></div>
+                            <div class='piece' id='p18' style='top:60vmin;left:50vmin;'></div>
+                            <div class='piece' id='p19' style='top:60vmin;left:70vmin;'></div>
+                            <div class='piece' id='p20' style='top:70vmin;left:0vmin;'></div>
+                            <div class='piece' id='p21' style='top:70vmin;left:20vmin;'></div>
+                            <div class='piece' id='p22' style='top:70vmin;left:40vmin;'></div>
+                            <div class='piece' id='p23' style='top:70vmin;left:60vmin;'></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
     </section>
 </template>

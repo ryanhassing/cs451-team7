@@ -25,7 +25,9 @@ app.on('ready', function () {
 
 
     console.log('App is now ready');
-    mainWindow = new BrowserWindow({width: 1200, height: 800})
+    mainWindow = new BrowserWindow({width: 1000, height: 700,   })
+  
+
 
     // and load the index.html of the app.
     console.log('loading index.html into mainWindow');
