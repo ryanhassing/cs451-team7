@@ -19,6 +19,23 @@ window.onload = function() {
                     [2, -1, 2, -1, 2, -1, 2, -1],
                     [-1, 2, -1, 2, -1, 2, -1, 2],
                     [2, -1, 2, -1, 2, -1, 2, -1]];
+
+    // below: the thing you send to the server
+    // not finalized
+    var gameStateObj = {
+        board: null,
+        playerOneTurn: null,
+        playerOneName: null,
+        playerTwoName: null,
+
+            // i would call this initialize, but we're updatinig this object all the time, so it's set
+            set: function (board, turn, p1, p2) {
+                this.board = board;
+                this.playerOneTurn = turn;
+                this.playerOneName  = p1;
+                this.playerTwoName = p2;
+            }
+        }
     
     function Board(boardConfig)  {
 
@@ -26,7 +43,7 @@ window.onload = function() {
             
         this.boxes = [],
         this.pieces = [],
-        this.player = (Math.random() <= 0.5) ? 1 : 2; //random player starts
+        this.playerTurn = (Math.random() <= 0.5) ? 1 : 2; //random player starts
 
         this.init = function() {
             let boxCount = 0;
@@ -36,114 +53,302 @@ window.onload = function() {
                     if (row % 2 == 1) { //odd row
                         if (column % 2 == 0) { //we're not saving the id as a string, we're saving as a jquery object
                             // even column
-                            this.boxes[boxCount] = new Box("#box" + boxCount, [row, column]);
+                            this.boxes[boxCount] = new Box("#box" + boxCount, [parseInt(row), parseInt(column)]);
                             boxCount++;
                         }
                     } else { //even row
                         if (column % 2 == 1) { // odd column
-                            this.boxes[boxCount] = new Box("#box" + boxCount, [row, column]);
+                            this.boxes[boxCount] = new Box("#box" + boxCount, [parseInt(row), parseInt(column)]);
                             boxCount++;
                         }   
                     }
-
                     if (this.board[row][column] == 1) { // now we assign pieces according to the startBoard setup, where player1 == 1 and player2 == 2
-                        this.pieces[pieceCount] = new Piece("#p" + pieceCount, [row, column]);
+                        this.pieces[pieceCount] = new Piece("#p" + pieceCount, [parseInt(row), parseInt(column)], 1);
                         pieceCount++;
                     } else if (this.board[row][column] == 2) {
-                        this.pieces[pieceCount] = new Piece("#p" + pieceCount, [row, column]);
+                        this.pieces[pieceCount] = new Piece("#p" + pieceCount, [parseInt(row), parseInt(column)], 2);
                         pieceCount++;
                     }
                 }
             }
         },
+        this.getBoxByPosition = function(row, column){
+            for(i = 0; i < this.boxes.length; i++){
+                if(this.boxes[i].pos[0] == row && this.boxes[i].pos[1] == column){
+                    console.log("found the box: " + this.boxes[i].id + " at " + this.boxes[i].pos)
+                    return this.boxes[i]
+                }
+            }
+        },
+        this.getBoxByIDString = function(IDString){ // get it from calling the dom $(this).attr("id")
+            for (element in this.boxes) {
+                if(this.boxes[element].id == '#' + IDString){
+                    row = this.boxes[element].pos[0];
+                    column = this.boxes[element].pos[1];
+                    return this.boxes[element];
+                }
+            }
+        },
+        this.getPieceByPosition = function(row, column){
+            for(i = 0; i < this.pieces.length; i++){
+                if(this.pieces[i].pos[0] == row && this.pieces[i].pos[1] == column){
+                    console.log("found the piece: " + this.pieces[i].id + " at " + this.pieces[i].pos)
+                    return this.pieces[i]
+                }
+            }
+        },
         //check if the location has an object
         this.isEmptyBox = function (row, column) {
-            if(this.board[row][column] == 0) {
-                return true;
-            } 
-            else{
-                return false;
+            if(row in this.board && column in this.board){ // check if index exists
+                if(this.board[row][column] == 0) {
+                    return true;
+                } 
+                else{
+                    return false;
+                }
             }
         },
         // i'm not sure if we even need this
         this.isUnreachableBox = function (row, column) { 
-            if(this.board[row][column] == -1) {
-                return true;
-            } 
-            else{
-                return false;
+            if(row in this.board && column in this.board){
+                if(this.board[row][column] == -1) {
+                    return true;
+                } 
+                else{
+                    return false;
+                }
             }
         },
         this.isP1 = function (row, column) {
-            if(this.board[row][column] == 1) {
-                return true;
-            } 
-            else{
-                return false;
+            if(row in this.board && column in this.board){
+                if(this.board[row][column] == 1) {
+                    return true;
+                } 
+                else{
+                    return false;
+                }
             }
-          },
-
+        },
         this.isP2 =  function (row, column) {
-            if(this.board[row][column] == 2) {
-                return true;
-            } 
-            else{
-                return false;
+            if(row in this.board && column in this.board){
+                if(this.board[row][column] == 2) {
+                    return true;
+                } 
+                else{
+                    return false;
+                }
             }
         },
         this.updateBoard =  function(type, row, column){
-            if(this.board[row][column] !== "undefined"){ // check if index exists
+            if(row in this.board && column in this.board){
                 this.board[row][column] = type 
             }
         },
-
         this.changePlayer = function(currentPlayer){
             if (currentPlayer == 1){
-                this.player = 2
+                this.playerTurn = 2
             }
             else if (currentPlayer == 2){
-                this.player = 1
+                this.playerTurn = 1
             }
             else{
                 alert("this is not supposed to happen")
             }
-        }
-
+        },
         this.printBoard = function(){
             console.table(this.board)
         }
-        
     }
 
-    function Box(id, pos) {
+    function Box(id, pos) { // i suppose this is more of a struct since it likely won't have any methods
         this.id = id;
         this.pos = pos
+    } 
 
-    }
-
-    function Piece(id, pos) {
+    function Piece(id, pos, piecePlayer) {
         this.id = id;
         this.pos = pos
+        this.piecePlayer = piecePlayer
 
+        this.validateMoveOneRowCol = function(boxObj){
+            let newPos = boxObj.pos;
+            let moveOneRow = Math.abs(parseInt(this.pos[0]) - parseInt(newPos[0]))
+            let moveOneColumn = Math.abs(parseInt(this.pos[1]) - parseInt(newPos[1]))
+
+            if(moveOneRow == 1 && moveOneColumn == 1){
+                console.log("this one row col") // good
+                return true
+            }
+            else{
+                console.log("that was not one row col")
+                return false
+            }
+        },
+
+        this.validateMoveByPlayer = function(boxObj){
+            // p1 can only move down
+            // p2 can only move up
+            let newPos = boxObj.pos;
+            let moveOneRow = Math.abs(parseInt(this.pos[0]) - parseInt(newPos[0]))
+            let moveOneColumn = Math.abs(parseInt(this.pos[1]) - parseInt(newPos[1]))
+
+            if (this.piecePlayer == 1){
+                if(this.pos[0] < newPos[0]){ // smaller means higher
+                    console.log("this is a valid move for p1") // good
+                    return true
+                }
+                else if (this.pos[0] > newPos[0]){
+                    console.log("this is an invalid move for p1") // bad
+                    return false
+                }
+            }
+            else if (this.piecePlayer == 2){
+                if(this.pos[0] < newPos[0]){ // smaller means higher
+                    console.log("this is an invalid move for p2") // bad
+                    return false
+                }
+                else if (this.pos[0] > newPos[0]){
+                    console.log("this is a valid move for p2") // good
+                    return true
+                }
+            }
+        },
+
+
+        this.emptyBoxInRange = function(row, column, direction){
+            //we'll make these enums later
+            //remember we have to repeat this and piece search until we are out of bounds
+            // and additional step in the enemy direction
+
+            let rowUp = row - parseInt(1);
+            let rowDown = row + parseInt(1);
+            let columnLeft = column - parseInt(1);
+            let columnRight = column + parseInt(1);
+            let targetBox = [] //it's not like  the enemies array, because you only have one target per enemuy
+            // meaing we don't push, we only have one positio value [row, col]
+
+            switch (direction) {
+                case "topR":
+                    console.log("r: " + rowUp + "c: " + columnRight)
+                    if(Board.isEmptyBox(rowUp, columnRight)){
+                        console.log("empty beyond the enemy topR")
+                        return targetBox = [rowUp, columnRight];
+                    }
+                    break;
+                case "botR":
+                    console.log("r: " + rowDown + "c: " + columnRight)
+                    if(Board.isEmptyBox(rowDown, columnRight)){
+                        console.log("empty beyond the enemy botR")
+                        return targetBox = [rowDown, columnRight];
+                    }
+                    break;
+                case "botL":
+                    console.log("r: " + rowDown + "c: " + columnLeft)
+                    if(Board.isEmptyBox(rowDown, columnLeft)){
+                        console.log("empty beyond the enemy botL")
+                        return targetBox = [rowDown, columnLeft];
+                    }
+                    break;
+                case "topL":
+                    console.log("r: " + rowUp + "c: " + columnLeft)
+                    if(Board.isEmptyBox(rowUp, columnLeft)){
+                        console.log("empty beyond the enemy topL")
+                        return targetBox = [rowUp, columnLeft];
+                    }
+                default:
+                    return targetBox // empty targets a.k.a false alarm. no eatable enemies
+            }
+        },
+
+        this.enemiesInRange = function(row, column){
+            
+            // because you must jump when it's possible
+            // if this is true, we restrict movement to only that jump
+            //https://www.itsyourturn.com/t_helptopic2030.html#helpitem1303
+
+            // top-right (p2) -1, +1
+            // top-left (p2) -1, -1
+            // bottom-right (p1) +1, +1
+            // bottom-left (p1) +1, -1
+
+            let enemies = [] // we will always have either 0, 1 or 2 enemies in range.
+
+            let thisRow = parseInt(this.pos[0])
+            let thisColumn = parseInt(this.pos[1]);
+
+            let thisRowUp = thisRow - parseInt(1);
+            let thisRowDown = thisRow + parseInt(1);
+            let thisColumnLeft = thisColumn - parseInt(1);
+            let thisColumnRight = thisColumn + parseInt(1);
+
+            let targetBoxCoords = []
+
+            // below are 2 ifs each for 2  players, meaning you will only ever be able to have 2 eat choices
+            // unless you are king. modification: include || this.isKing at each player check. then king will have 4
+            if (this.piecePlayer == 1){ 
+                if(Board.isP2(thisRowDown, thisColumnRight) == true){ //bottom-right
+                    console.log("p1 found an enemy bottom-right")
+                    targetBoxCoords = this.emptyBoxInRange(thisRowDown, thisColumnRight, "botR")
+                    if(!(typeof targetBoxCoords == "undefined" || targetBoxCoords == null )){ //here, box = [row, col]
+                        enemies.push([Board.getPieceByPosition(thisRowDown, thisColumnRight), 
+                                    Board.getBoxByPosition(targetBoxCoords[0], targetBoxCoords[1])]) // format: ememies = [pieceObj, boxObj]
+                    }
+                }
+                if(Board.isP2(thisRowDown, thisColumnLeft) == true){ //bottom-left
+                    console.log("p1 found an enemy bottom-left")
+                    targetBoxCoords = this.emptyBoxInRange(thisRowDown, thisColumnLeft, "botL")
+                    if(!(typeof targetBoxCoords == "undefined" || targetBoxCoords == null )){
+                        enemies.push([Board.getPieceByPosition(thisRowDown, thisColumnLeft), 
+                            Board.getBoxByPosition(targetBoxCoords[0], targetBoxCoords[1])]) // format: ememies = [pieceObj, boxObj]
+                    }
+                } // if nothing is logged, enemy is not found
+            }
+            else if (this.piecePlayer == 2){
+                if(Board.isP1(thisRowUp, thisColumnRight) == true){ //top-right
+                    console.log("p2 found an enemy top-right")
+                    targetBoxCoords = this.emptyBoxInRange(thisRowUp, thisColumnRight, "topR")
+                    if(!(typeof targetBoxCoords == "undefined" || targetBoxCoords == null )){
+                        enemies.push([Board.getPieceByPosition(thisRowUp, thisColumnRight), 
+                            Board.getBoxByPosition(targetBoxCoords[0], targetBoxCoords[1])])
+                    }
+                }
+                if(Board.isP1(thisRowUp, thisColumnLeft) == true){ //top-left
+                    console.log("p2 found an enemy top-left")
+                    targetBoxCoords = this.emptyBoxInRange(thisRowUp, thisColumnLeft, "topL")
+                    if(!(typeof targetBoxCoords == "undefined" || targetBoxCoords == null )){
+                        enemies.push([Board.getPieceByPosition(thisRowUp, thisColumnLeft), 
+                            Board.getBoxByPosition(targetBoxCoords[0], targetBoxCoords[1])])
+                    }
+                } // if nothing is logged enem is not found
+            }
+            else{
+                console.log("this ain't supposed to happen")
+            }
+            return enemies // just determine true/false  from whenther this is empty or not
+        },
         this.movePiece = function(boxObj){
             newPos = boxObj.pos;
-            // we don't care about restrictions now
-            // if the box is empty, we just move it there
-
+        
             if(Board.isEmptyBox(newPos[0],newPos[1])){
                 Board.updateBoard(0, this.pos[0], this.pos[1]) 
                 this.pos = newPos // this is extremely important. update the position only after marking the orig pos with 0
-                Board.updateBoard(Board.player, newPos[0], newPos[1]);
+                Board.updateBoard(Board.playerTurn, newPos[0], newPos[1]);
                 $(id).css('top', posToCss[newPos[0]]);
                 $(id).css('left', posToCss[newPos[1]]);
                 $(id).removeClass('highlight');
-                Board.changePlayer(Board.player);
+                Board.changePlayer(Board.playerTurn);
                 Board.printBoard(); 
             }
             else{
                 alert("you can't move there")
+                return false;
             }
             return true;  
+        },
+        this.removeSelf = function(){
+            $(id).css("display", "none");
+            Board.updateBoard(0, this.pos[0], this.pos[1]);
+            this.pos = [];
         };
     }
 
@@ -151,19 +356,40 @@ window.onload = function() {
     //initialize the board;
     var Board = new Board(boardConfig);
     Board.init();
+    // var myJSON = JSON.stringify(Board);
+    // console.log(myJSON);
     
     $('.piece').on("click", function () {
-        
-        let isPlayerTurn = ($(this).parent().attr("class") == "player" + Board.player);
+
+        let pieceIDString = null;
+        let pieceObj = null;
+        let enemiesAround = [];
+        let isPlayerTurn = ($(this).parent().attr("class") == "player" + Board.playerTurn);
 
         if(isPlayerTurn == true){
             $(this).toggleClass('highlight');
             $(this).siblings().removeClass('highlight');
+
+            //below is a repeat from box onclick func. see if you can make a function for it
+            // we may need this in the future to force a jump
+            // other than that it merely outputs to console
+            pieceIDString = $( ".piece" ).filter( document.getElementsByClassName( "highlight" )).attr("id");
+            for(element in Board.pieces){
+                if(Board.pieces[element].id == "#" + pieceIDString){
+                    pieceObj = Board.pieces[element];
+                }
+            }
+            if(!!pieceObj){ // if not null
+                enemiesAround = pieceObj.enemiesInRange().slice();
+                if(!(enemiesAround == undefined || enemiesAround.length == 0)){
+                console.log("YOU CAN KILL HIM HERE")
+                // at this point, the piece does not obey the row1 col1 rule. now it obeys the row2 col2 rule
+                // but the piece MUST land at the returned empty box
+                }
+            }
         }
         else{
             alert("it's not your turn!!!!!!!!!!!!!!!!!") // of course we don't just throw out alerts here and there. inform the player within that column on the left. that comes later
-         
-            
         }
       });
 
@@ -173,9 +399,11 @@ window.onload = function() {
         let boxIDString = null;
         let pieceObj = null;
         let boxObj = null;
+        let enemiesAround = [];
+        let boxesAround = [];
 
         // box's visual aspect isn't really needed at this point, BUT
-        // future TODO: reahcable box is highlighted after after piece is clicked
+        // future TODO: reahcable box is highlighted after after piece is clicked. priority 3 feature
         $(this).toggleClass("highlight"); 
         $(this).siblings().removeClass('highlight');
 
@@ -185,21 +413,36 @@ window.onload = function() {
             console.log("you gotta click on a piece first to move it here");
         }else{
             boxIDString = $(this).attr('id');
-            for (element in Board.boxes) {
-                if(Board.boxes[element].id == '#' + boxIDString){
-                    row = Board.boxes[element].pos[0];
-                    column = Board.boxes[element].pos[1];
-                    boxObj = Board.boxes[element];
-                }
-            }
-            // now let's get the picece that's currently selected
-            //below gets you the id of the selected piece when you click the box. format: "p16"
+            boxObj = Board.getBoxByIDString(boxIDString);
+
             for(element in Board.pieces){
                 if(Board.pieces[element].id == "#" + pieceIDString){
                     pieceObj = Board.pieces[element];
                 }
             }
-            pieceObj.movePiece(boxObj);  
+            if(!!pieceObj){ // if not null
+                enemiesAround = pieceObj.enemiesInRange().slice();
+                if(!(enemiesAround == undefined || enemiesAround.length == 0)){
+                    console.log("YOU COULD HAVE KILLED HIM THERE") // future TODO we want to restrict any other move if you can kill em
+                    // this is not the place to do it. you gotta scan the the entire board to see if any jumps are possible from the current player
+
+                    //enemiesAround format: [[pieceObj, boxObj], [pieceObj, boxObj]]
+                    // goal: extract the id's for all the objects invlolved
+                    for(i = 0; i < enemiesAround.length; i++){
+                        if("#" + boxIDString == enemiesAround[i][1].id){
+                            pieceObj.movePiece(enemiesAround[i][1])
+                            enemiesAround[i][0].removeSelf();
+                        }                 
+                    }
+                }
+            }
+            if (pieceObj.validateMoveByPlayer(boxObj) && pieceObj.validateMoveOneRowCol(boxObj)){
+                pieceObj.movePiece(boxObj);  
+            }
+            else{
+                console.log("that's a no-no move, bud! OR YOU JUST ATE A MAN")
+                //we don't actually alert the player in the main app
+            }
         }        
     });
 }
