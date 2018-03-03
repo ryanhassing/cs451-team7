@@ -97,41 +97,33 @@ window.onload = function() {
                 }
             }
         },
+        this.getSqareType = function (row, column){
+
+            if(row in this.board && column in this.board){ 
+                let type = this.board[row][column]
+                switch (type) {
+                    case 0:
+                        return 0
+                        break;
+                    case -1:
+                        return -1
+                        break;
+                    case 1:
+                        return 1 
+                        break;
+                    case 2:
+                        return 2
+                        break;
+                    default:
+                        return null 
+                }
+            }
+            return null 
+        },
         //check if the location has an object
         this.isEmptyBox = function (row, column) {
             if(row in this.board && column in this.board){ // check if index exists
                 if(this.board[row][column] == 0) {
-                    return true;
-                } 
-                else{
-                    return false;
-                }
-            }
-        },
-        // i'm not sure if we even need this
-        this.isUnreachableBox = function (row, column) { 
-            if(row in this.board && column in this.board){
-                if(this.board[row][column] == -1) {
-                    return true;
-                } 
-                else{
-                    return false;
-                }
-            }
-        },
-        this.isP1 = function (row, column) {
-            if(row in this.board && column in this.board){
-                if(this.board[row][column] == 1) {
-                    return true;
-                } 
-                else{
-                    return false;
-                }
-            }
-        },
-        this.isP2 =  function (row, column) {
-            if(row in this.board && column in this.board){
-                if(this.board[row][column] == 2) {
                     return true;
                 } 
                 else{
@@ -157,6 +149,23 @@ window.onload = function() {
         },
         this.printBoard = function(){
             console.table(this.board)
+        },
+        this.resetBoard = function(){
+            // coming soon!
+        },
+        this.isGameOver = function(){
+            let over = false;
+            let p1Count = 0; // we might make player count a board attribute in the future
+            let p2Count = 0;
+
+            for(var i=0;i < this.board.length;i++){
+                for(var j=0;j<this.board[i].length;j++){
+                  if(this.board[i][j] == 1){ p1Count++}
+                  if(this.board[i][j] == 2){ p2Count++}
+                }
+              }
+
+              return p1Count == 0 || p2Count == 0 ? true : false
         }
     }
 
@@ -169,6 +178,7 @@ window.onload = function() {
         this.id = id;
         this.pos = pos
         this.piecePlayer = piecePlayer
+        this.isKing = false;
 
         this.validateMoveOneRowCol = function(boxObj){
             let newPos = boxObj.pos;
@@ -191,7 +201,10 @@ window.onload = function() {
             let newPos = boxObj.pos;
             let moveOneRow = Math.abs(parseInt(this.pos[0]) - parseInt(newPos[0]))
             let moveOneColumn = Math.abs(parseInt(this.pos[1]) - parseInt(newPos[1]))
-
+           
+            if(this.isKing){
+                return true;
+            }// don't bother with the below stuff
             if (this.piecePlayer == 1){
                 if(this.pos[0] < newPos[0]){ // smaller means higher
                     console.log("this is a valid move for p1") // good
@@ -213,8 +226,9 @@ window.onload = function() {
                 }
             }
         },
-
-
+        this.isBlocked = function(){
+            //coming soon!
+        }
         this.emptyBoxInRange = function(row, column, direction){
             //we'll make these enums later
             //remember we have to repeat this and piece search until we are out of bounds
@@ -260,11 +274,23 @@ window.onload = function() {
             }
         },
 
-        this.enemiesInRange = function(row, column){
+        this.enemiesDirtyWork = function(rowLookup, columnLookup, dir, enemyPlayer){
             
-            // because you must jump when it's possible
-            // if this is true, we restrict movement to only that jump
-            //https://www.itsyourturn.com/t_helptopic2030.html#helpitem1303
+            let enemy = []
+            
+            if(Board.getSqareType(rowLookup, columnLookup) == enemyPlayer){
+                targetBoxCoords = this.emptyBoxInRange(rowLookup, columnLookup, dir)
+                if(!(typeof targetBoxCoords == "undefined" || targetBoxCoords == null )){ //here, box = [row, col]
+                    enemy = [Board.getPieceByPosition(rowLookup, columnLookup), 
+                                Board.getBoxByPosition(targetBoxCoords[0], targetBoxCoords[1])] // format: ememies = [pieceObj, boxObj]
+                }
+            }
+            return enemy
+        },
+
+        this.enemiesInRange = function(row, column){
+  
+            // stil needs the force jump loop
 
             // top-right (p2) -1, +1
             // top-left (p2) -1, -1
@@ -285,46 +311,24 @@ window.onload = function() {
 
             // below are 2 ifs each for 2  players, meaning you will only ever be able to have 2 eat choices
             // unless you are king. modification: include || this.isKing at each player check. then king will have 4
-            if (this.piecePlayer == 1){ 
-                if(Board.isP2(thisRowDown, thisColumnRight) == true){ //bottom-right
-                    console.log("p1 found an enemy bottom-right")
-                    targetBoxCoords = this.emptyBoxInRange(thisRowDown, thisColumnRight, "botR")
-                    if(!(typeof targetBoxCoords == "undefined" || targetBoxCoords == null )){ //here, box = [row, col]
-                        enemies.push([Board.getPieceByPosition(thisRowDown, thisColumnRight), 
-                                    Board.getBoxByPosition(targetBoxCoords[0], targetBoxCoords[1])]) // format: ememies = [pieceObj, boxObj]
-                    }
+            if(this.piecePlayer == 1){
+                enemies.push(this.enemiesDirtyWork(thisRowDown, thisColumnRight, "botR", 2))
+                enemies.push(this.enemiesDirtyWork(thisRowDown, thisColumnLeft, "botL", 2))
+                if (this.isKing == true){
+                    enemies.push(this.enemiesDirtyWork(thisRowUp, thisColumnRight, "topR", 2))
+                    enemies.push(this.enemiesDirtyWork(thisRowUp, thisColumnLeft, "topL", 2))
                 }
-                if(Board.isP2(thisRowDown, thisColumnLeft) == true){ //bottom-left
-                    console.log("p1 found an enemy bottom-left")
-                    targetBoxCoords = this.emptyBoxInRange(thisRowDown, thisColumnLeft, "botL")
-                    if(!(typeof targetBoxCoords == "undefined" || targetBoxCoords == null )){
-                        enemies.push([Board.getPieceByPosition(thisRowDown, thisColumnLeft), 
-                            Board.getBoxByPosition(targetBoxCoords[0], targetBoxCoords[1])]) // format: ememies = [pieceObj, boxObj]
-                    }
-                } // if nothing is logged, enemy is not found
+                
             }
-            else if (this.piecePlayer == 2){
-                if(Board.isP1(thisRowUp, thisColumnRight) == true){ //top-right
-                    console.log("p2 found an enemy top-right")
-                    targetBoxCoords = this.emptyBoxInRange(thisRowUp, thisColumnRight, "topR")
-                    if(!(typeof targetBoxCoords == "undefined" || targetBoxCoords == null )){
-                        enemies.push([Board.getPieceByPosition(thisRowUp, thisColumnRight), 
-                            Board.getBoxByPosition(targetBoxCoords[0], targetBoxCoords[1])])
-                    }
+            if(this.piecePlayer == 2){
+                if(this.isKing == true){
+                    enemies.push(this.enemiesDirtyWork(thisRowDown, thisColumnRight, "botR", 1))
+                    enemies.push(this.enemiesDirtyWork(thisRowDown, thisColumnLeft, "botL", 1))
                 }
-                if(Board.isP1(thisRowUp, thisColumnLeft) == true){ //top-left
-                    console.log("p2 found an enemy top-left")
-                    targetBoxCoords = this.emptyBoxInRange(thisRowUp, thisColumnLeft, "topL")
-                    if(!(typeof targetBoxCoords == "undefined" || targetBoxCoords == null )){
-                        enemies.push([Board.getPieceByPosition(thisRowUp, thisColumnLeft), 
-                            Board.getBoxByPosition(targetBoxCoords[0], targetBoxCoords[1])])
-                    }
-                } // if nothing is logged enem is not found
+                enemies.push(this.enemiesDirtyWork(thisRowUp, thisColumnRight, "topR", 1))
+                enemies.push(this.enemiesDirtyWork(thisRowUp, thisColumnLeft, "topL", 1))
             }
-            else{
-                console.log("this ain't supposed to happen")
-            }
-            return enemies // just determine true/false  from whenther this is empty or not
+            return enemies
         },
         this.movePiece = function(boxObj){
             newPos = boxObj.pos;
@@ -336,6 +340,12 @@ window.onload = function() {
                 $(id).css('top', posToCss[newPos[0]]);
                 $(id).css('left', posToCss[newPos[1]]);
                 $(id).removeClass('highlight');
+
+                if(this.isKing == false){
+                    if(this.pos[0] == 0 || this.pos[0] == 7){
+                        this.kingSelf();
+                    }
+                }
                 Board.changePlayer(Board.playerTurn);
                 Board.printBoard(); 
             }
@@ -345,6 +355,11 @@ window.onload = function() {
             }
             return true;  
         },
+        this.kingSelf = function(){
+            this.isKing = true;
+            $(id).css("border-style","solid")
+        },
+
         this.removeSelf = function(){
             $(id).css("display", "none");
             Board.updateBoard(0, this.pos[0], this.pos[1]);
@@ -360,6 +375,7 @@ window.onload = function() {
     // console.log(myJSON);
     
     $('.piece').on("click", function () {
+        console.log("GAME OVER: " + Board.isGameOver())
 
         let pieceIDString = null;
         let pieceObj = null;
@@ -427,9 +443,8 @@ window.onload = function() {
                     // this is not the place to do it. you gotta scan the the entire board to see if any jumps are possible from the current player
 
                     //enemiesAround format: [[pieceObj, boxObj], [pieceObj, boxObj]]
-                    // goal: extract the id's for all the objects invlolved
                     for(i = 0; i < enemiesAround.length; i++){
-                        if("#" + boxIDString == enemiesAround[i][1].id){
+                        if(!(enemiesAround[i][1] == undefined) && "#" + boxIDString == enemiesAround[i][1].id){
                             pieceObj.movePiece(enemiesAround[i][1])
                             enemiesAround[i][0].removeSelf();
                         }                 
@@ -438,9 +453,14 @@ window.onload = function() {
             }
             if (pieceObj.validateMoveByPlayer(boxObj) && pieceObj.validateMoveOneRowCol(boxObj)){
                 pieceObj.movePiece(boxObj);  
+                
             }
             else{
+                Board.printBoard();
                 console.log("that's a no-no move, bud! OR YOU JUST ATE A MAN")
+                if(Board.isGameOver()){ // TODO : delay this so that piece eating occurs before the alert
+                    alert("GAME OVER!") // we'll let you if p1 or p2 wins in future iters
+                }
                 //we don't actually alert the player in the main app
             }
         }        

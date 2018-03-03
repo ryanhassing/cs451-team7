@@ -56,9 +56,9 @@ div#board .box {
 	background-color: rgb(31, 29, 29);
 	cursor: default;
 }
-div#board .box.highlight {
+/* div#board .box.highlight {
 	background-color: rgb(54, 52, 52);
-}
+} */
 
 #board .player2 .piece {
 	position: absolute;
