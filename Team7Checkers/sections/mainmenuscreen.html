@@ -1,12 +1,37 @@
 <template class="section-template">
     <section id="mainmenuscreen" class="wrapper">
-        <h1>CS451 Checkers Application</h1>
-        <h1>You're in mainmenu</h1>
-        <hr>
-        <!-- The menu really beliongs here, not a sticky like it is now. -->
-        <!-- We will refine navigation later -->
-        <button id="welcome-menu" data-section="joinscreen" href="#">joinscreen</button>
+        
+            <div id="modal-screen" class="modal">
+
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                           
+                        <div class="aligner">
+                        
+                        <p class="newh1">Enter your name:</p>
+
+                                    <input type="text" name="fname"><br> <!--channge to span so on same line as button-->
+                                    <button class="buttongame">Play!</button>
+                               
+                        <p>This text changes to "waitinfg for another player" if game is created </p> 
+                        <p>this is actually supposed to appear when you click play game</p> 
+                        <div>
+                        <button id="cancel-join" class="buttongame" >Cancel</button>
+                    </div>
+                    </div>
+                    </div>
+                
+                </div>
+ 
+            <div class="menu-aligner">
+                    <p class="t7c-title">Team 7 Checkers</p>
+                <button data-section="maingamescreen"class="menu-button">Play Checkers!</button> 
+                <button data-section="rulesscreen" class="menu-button">Rules</button>  
+                <button id="join" class="menu-button">Exit</button>
+            </div>
+    
+        <!-- <button id="welcome-menu" data-section="joinscreen" href="#">joinscreen</button>
         <button data-section="maingamescreen" href="#">maingamescreen</button>
-        <button data-section="rulesscreen" href="#">rulesscreen</button>
+        <button data-section="rulesscreen" href="#">rulesscreen</button> -->
     </section>
 </template>

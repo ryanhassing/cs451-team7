@@ -78,19 +78,6 @@ div#board .box {
 	
 }
 
-/* .piece::after{
-	content: "\f137";
-	font-family: "foundation-icons";
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    text-decoration: inherit;
-} */
-
 .player2 .piece.king::after {
 	content: "\f137";
     font-family: "foundation-icons";
