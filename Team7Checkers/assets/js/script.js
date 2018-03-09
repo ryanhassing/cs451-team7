@@ -1,6 +1,6 @@
 window.onload = function() {
 
- 
+    
     // the vmin indices translate directly to the pieceObj and boxObj pos variable
     var posToCss = ["0vmin", "10vmin", "20vmin", "30vmin", "40vmin", "50vmin", "60vmin", "70vmin", "80vmin", "90vmin"]
     // right now, only this configuration is supported because visuals are hardcoded in html
@@ -19,31 +19,18 @@ window.onload = function() {
                     [2, -1, 2, -1, 2, -1, 2, -1],
                     [-1, 2, -1, 2, -1, 2, -1, 2],
                     [2, -1, 2, -1, 2, -1, 2, -1]];
-
-    // below: the thing you send to the server
-    // not finalized
-    var gameStateObj = {
-        board: null,
-        playerOneTurn: null,
-        playerOneName: null,
-        playerTwoName: null,
-
-            // i would call this initialize, but we're updatinig this object all the time, so it's set
-            set: function (board, turn, p1, p2) {
-                this.board = board;
-                this.playerOneTurn = turn;
-                this.playerOneName  = p1;
-                this.playerTwoName = p2;
-            }
-        }
     
-    function Board(boardConfig)  {
+    function Board(boardConfig, p1Name, p2Name)  {
 
-        this.board = boardConfig
-            
+        this.board = boardConfig;
+        this.p1Name = p1Name;
+        this.p2Name = p2Name;
+        this.p1Score = 0;
+        this.p2Score = 0;
         this.boxes = [],
         this.pieces = [],
         this.playerTurn = (Math.random() <= 0.5) ? 1 : 2; //random player starts
+        // we need a game id here
 
         this.init = function() {
             let boxCount = 0;
@@ -71,7 +58,17 @@ window.onload = function() {
                     }
                 }
             }
+            
         },
+        //todo: a rest method
+        this.updateScore = function(){
+            if(this.playerTurn == 1){
+                this.p1Score++
+            }
+            else if (this.playerTurn == 2){
+                this.p2Score++
+            }
+        }
         this.getBoxByPosition = function(row, column){
             for(i = 0; i < this.boxes.length; i++){
                 if(this.boxes[i].pos[0] == row && this.boxes[i].pos[1] == column){
@@ -150,22 +147,30 @@ window.onload = function() {
         this.printBoard = function(){
             console.table(this.board)
         },
-        this.resetBoard = function(){
-            // coming soon!
+        this.resetBoard = function(boardConfig){
+            this.board = [[-1, 1, -1, 1, -1, 1, -1, 1],
+            [1, -1, 1, -1, 1, -1, 1, -1],
+            [-1, 1, -1, 1, -1, 1, -1, 1],
+            [0, -1, 0, -1, 0, -1, 0, -1],
+            [-1, 0, -1, 0, -1, 0, -1, 0],
+            [2, -1, 2, -1, 2, -1, 2, -1],
+            [-1, 2, -1, 2, -1, 2, -1, 2],
+            [2, -1, 2, -1, 2, -1, 2, -1]]; // something wrong with reading boardConfig param
+            this.p1Score = 0;
+            this.p2Score = 0;
+            this.boxes = [],
+            this.pieces = [],
+            //this.playerTurn = (Math.random() <= 0.5) ? 1 : 2;
+            this.init();
+            $('#maingamescreen').html($('#maingamescreen').data('old-state'));
+            console.log("resetBoard")
+            this.printBoard()
         },
         this.isGameOver = function(){
-            let over = false;
-            let p1Count = 0; // we might make player count a board attribute in the future
-            let p2Count = 0;
-
-            for(var i=0;i < this.board.length;i++){
-                for(var j=0;j<this.board[i].length;j++){
-                  if(this.board[i][j] == 1){ p1Count++}
-                  if(this.board[i][j] == 2){ p2Count++}
-                }
-              }
-
-              return p1Count == 0 || p2Count == 0 ? true : false
+            if(this.p1Score == 12|| this.p2Score == 12){
+                return true
+            }
+            return false
         }
     }
 
@@ -208,20 +213,24 @@ window.onload = function() {
             if (this.piecePlayer == 1){
                 if(this.pos[0] < newPos[0]){ // smaller means higher
                     console.log("this is a valid move for p1") // good
+             
                     return true
                 }
                 else if (this.pos[0] > newPos[0]){
                     console.log("this is an invalid move for p1") // bad
+       
                     return false
                 }
             }
             else if (this.piecePlayer == 2){
                 if(this.pos[0] < newPos[0]){ // smaller means higher
                     console.log("this is an invalid move for p2") // bad
+                   
                     return false
                 }
                 else if (this.pos[0] > newPos[0]){
                     console.log("this is a valid move for p2") // good
+                   
                     return true
                 }
             }
@@ -310,15 +319,13 @@ window.onload = function() {
             let targetBoxCoords = []
 
             // below are 2 ifs each for 2  players, meaning you will only ever be able to have 2 eat choices
-            // unless you are king. modification: include || this.isKing at each player check. then king will have 4
             if(this.piecePlayer == 1){
                 enemies.push(this.enemiesDirtyWork(thisRowDown, thisColumnRight, "botR", 2))
                 enemies.push(this.enemiesDirtyWork(thisRowDown, thisColumnLeft, "botL", 2))
                 if (this.isKing == true){
                     enemies.push(this.enemiesDirtyWork(thisRowUp, thisColumnRight, "topR", 2))
                     enemies.push(this.enemiesDirtyWork(thisRowUp, thisColumnLeft, "topL", 2))
-                }
-                
+                } 
             }
             if(this.piecePlayer == 2){
                 if(this.isKing == true){
@@ -333,7 +340,7 @@ window.onload = function() {
         this.movePiece = function(boxObj){
             newPos = boxObj.pos;
         
-            if(Board.isEmptyBox(newPos[0],newPos[1])){
+            if(Board.isEmptyBox(newPos[0],newPos[1]) && !Board.isGameOver()){
                 Board.updateBoard(0, this.pos[0], this.pos[1]) 
                 this.pos = newPos // this is extremely important. update the position only after marking the orig pos with 0
                 Board.updateBoard(Board.playerTurn, newPos[0], newPos[1]);
@@ -350,14 +357,14 @@ window.onload = function() {
                 Board.printBoard(); 
             }
             else{
-                alert("you can't move there")
+                $('.info-text').text("Invalid move: That's an occupied square!");
                 return false;
             }
             return true;  
         },
         this.kingSelf = function(){
             this.isKing = true;
-            $(id).css("border-style","solid")
+            $(id).addClass("king")
         },
 
         this.removeSelf = function(){
@@ -369,14 +376,21 @@ window.onload = function() {
 
     ///// I suppose this is the main() ///////
     //initialize the board;
-    var Board = new Board(boardConfig);
+    var Board = new Board(boardConfig,"Alice", "Bob");
     Board.init();
+    updateGameScreen();
+    console.log("p1:" + Board.p1Name + ", " + Board.p2Name)
+    $("#p1-box > span.p-name").text(Board.p1Name)
+    $("#p2-box > span:nth-child(1)").text(Board.p2Name)
+    $('#maingamescreen').data('old-state', $('#maingamescreen').html()); // store the old html config
+    
+    
     // var myJSON = JSON.stringify(Board);
     // console.log(myJSON);
     
-    $('.piece').on("click", function () {
-        console.log("GAME OVER: " + Board.isGameOver())
-
+    $(document).on("click", ".piece",function () {
+        
+      
         let pieceIDString = null;
         let pieceObj = null;
         let enemiesAround = [];
@@ -405,11 +419,42 @@ window.onload = function() {
             }
         }
         else{
-            alert("it's not your turn!!!!!!!!!!!!!!!!!") // of course we don't just throw out alerts here and there. inform the player within that column on the left. that comes later
+            $('.info-text').text("It's Player " + Board.playerTurn + "'s turn!");
         }
       });
 
-    $('.box').on("click", function () { 
+    function updateGameScreen(){
+
+        if (Board.isGameOver()){
+            $(".info-text").text("Game Over! Player " + Board.playerTurn + " wins the game!" )
+            modal.css("display", "flex")
+            
+        }
+        console.log("is it game over?" + Board.isGameOver());
+
+        if(Board.playerTurn == 1){
+            $("#p1-box").addClass("playing")
+            $("#p2-box").removeClass("playing")
+        }
+        else if(Board.playerTurn == 2){
+            $("#p2-box").addClass("playing")
+            $("#p1-box").removeClass("playing")
+        }
+
+         for(let i = 0; i < Board.p1Score; i++){
+            console.log("p1 loop : " + parseInt(i + 1));
+            $("#p1-box > div > span:nth-child(" + parseInt(i + 1) + ")").addClass("dead");
+         }
+
+         for(let i = 0; i < Board.p2Score; i++){
+            console.log("p2 loop : " + parseInt(i + 1));
+            $("#p2-box > div > span:nth-child(" + parseInt(i + 1) + ")").addClass("dead");
+         }
+         
+        
+    }
+
+    $(document).on("click", '.box',function () { 
 
         let pieceIDString = null;
         let boxIDString = null;
@@ -418,8 +463,6 @@ window.onload = function() {
         let enemiesAround = [];
         let boxesAround = [];
 
-        // box's visual aspect isn't really needed at this point, BUT
-        // future TODO: reahcable box is highlighted after after piece is clicked. priority 3 feature
         $(this).toggleClass("highlight"); 
         $(this).siblings().removeClass('highlight');
 
@@ -445,24 +488,35 @@ window.onload = function() {
                     //enemiesAround format: [[pieceObj, boxObj], [pieceObj, boxObj]]
                     for(i = 0; i < enemiesAround.length; i++){
                         if(!(enemiesAround[i][1] == undefined) && "#" + boxIDString == enemiesAround[i][1].id){
+                            $('.info-text').text("Player " + Board.playerTurn + " captures!");
+                            Board.updateScore();
+                            //updateGameScreen();
+                            console.log("Tally: 1 has " + Board.p1Score + "and 2 has " + Board.p2Score)
                             pieceObj.movePiece(enemiesAround[i][1])
+                            updateGameScreen();
                             enemiesAround[i][0].removeSelf();
                         }                 
                     }
                 }
             }
             if (pieceObj.validateMoveByPlayer(boxObj) && pieceObj.validateMoveOneRowCol(boxObj)){
-                pieceObj.movePiece(boxObj);  
-                
-            }
-            else{
-                Board.printBoard();
-                console.log("that's a no-no move, bud! OR YOU JUST ATE A MAN")
-                if(Board.isGameOver()){ // TODO : delay this so that piece eating occurs before the alert
-                    alert("GAME OVER!") // we'll let you if p1 or p2 wins in future iters
-                }
-                //we don't actually alert the player in the main app
+                pieceObj.movePiece(boxObj);
+                updateGameScreen();  
+                $('.info-text').text("Player " +  Board.playerTurn + " to move.");
             }
         }        
     });
+
+    $(document).on("click", "#forfeit",function(){
+        $("#modal-screen").css("display", "flex")
+    })
+    $(document).on("click", ".leave", function(){
+        Board.resetBoard(boardConfig);
+        $("#modal-screen").css("display", "none")
+    })
+    $(document).on("click", "#restart-game", function(){
+        Board.resetBoard(boardConfig);
+    })
+    
+    
 }

@@ -2,13 +2,74 @@
     <section id="maingamescreen" class="wrapper">
         <!-- <h1>You're in maingamescreen</h1>
         <hr> -->
-        
 
+
+                <!-- The Modal -->
+        <div id="modal-screen" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+                   
+                <div class="aligner">
+                
+                <p class="newh1">Player whatever wins!</p>
+                <i class="fi-burst">
+                        <i class="fi-trophy"></i>
+                </i>
+                
+                <p>You both have to hit restart for a rematch. </p> 
+                <div>
+                <button id="restart-game" class="buttongame">Restart Game</button>
+                <button id="start-menu" class="buttongame leave" data-section="mainmenuscreen" href="#">Leave Game</button>
+            </div>
+            </div>
+            </div>
+        
+        </div>
+        
         <div class="container">
             <div class="nav">
-                Left Nav. All the game info goes here.
+                <div class="info-text">Start match!</div>
                 <br>
-                <button id="start-menu" class="buttongame" data-section="mainmenuscreen" href="#">Leave Game</button>
+                
+                <div id="p1-box" class="info-box">Player 1: 
+                    <span class="p-name"></span>
+                    <div class="eaten">
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                    </div>
+                </div>
+                <div id="p2-box" class="info-box">Player 2: 
+                    <span class"p-name"></span>
+                    <div class="eaten">
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                        <span class="eaten-circle"></span>
+                    </div>
+                </div>
+                <div>
+                    <button id="forfeit" class="buttongame">Forfeit</button> 
+                    <button id="start-menu" class="buttongame leave" data-section="mainmenuscreen" href="#">Leave Game</button>
+                </div>
             </div>
             
             <div class="main">
