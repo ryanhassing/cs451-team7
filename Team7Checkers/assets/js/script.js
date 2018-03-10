@@ -2,7 +2,7 @@ $( document ).ready(function() {
 
 
 
-    
+
     // the vmin indices translate directly to the pieceObj and boxObj pos variable
     var posToCss = ["0vmin", "10vmin", "20vmin", "30vmin", "40vmin", "50vmin", "60vmin", "70vmin", "80vmin", "90vmin"]
     // right now, only this configuration is supported because visuals are hardcoded in html
@@ -21,7 +21,7 @@ $( document ).ready(function() {
                     [2, -1, 2, -1, 2, -1, 2, -1],
                     [-1, 2, -1, 2, -1, 2, -1, 2],
                     [2, -1, 2, -1, 2, -1, 2, -1]];
-    
+
     function Board(boardConfig, p1Name, p2Name)  {
 
         this.board = boardConfig;
@@ -49,7 +49,7 @@ $( document ).ready(function() {
                         if (column % 2 == 1) { // odd column
                             this.boxes[boxCount] = new Box("#box" + boxCount, [parseInt(row), parseInt(column)]);
                             boxCount++;
-                        }   
+                        }
                     }
                     if (this.board[row][column] == 1) { // now we assign pieces according to the startBoard setup, where player1 == 1 and player2 == 2
                         this.pieces[pieceCount] = new Piece("#p" + pieceCount, [parseInt(row), parseInt(column)], 1);
@@ -60,7 +60,7 @@ $( document ).ready(function() {
                     }
                 }
             }
-            
+
         },
         //todo: a rest method
         this.updateScore = function(){
@@ -98,7 +98,7 @@ $( document ).ready(function() {
         },
         this.getSqareType = function (row, column){
 
-            if(row in this.board && column in this.board){ 
+            if(row in this.board && column in this.board){
                 let type = this.board[row][column]
                 switch (type) {
                     case 0:
@@ -108,23 +108,23 @@ $( document ).ready(function() {
                         return -1
                         break;
                     case 1:
-                        return 1 
+                        return 1
                         break;
                     case 2:
                         return 2
                         break;
                     default:
-                        return null 
+                        return null
                 }
             }
-            return null 
+            return null
         },
         //check if the location has an object
         this.isEmptyBox = function (row, column) {
             if(row in this.board && column in this.board){ // check if index exists
                 if(this.board[row][column] == 0) {
                     return true;
-                } 
+                }
                 else{
                     return false;
                 }
@@ -132,7 +132,7 @@ $( document ).ready(function() {
         },
         this.updateBoard =  function(type, row, column){
             if(row in this.board && column in this.board){
-                this.board[row][column] = type 
+                this.board[row][column] = type
             }
         },
         this.changePlayer = function(currentPlayer){
@@ -179,7 +179,7 @@ $( document ).ready(function() {
     function Box(id, pos) { // i suppose this is more of a struct since it likely won't have any methods
         this.id = id;
         this.pos = pos
-    } 
+    }
 
     function Piece(id, pos, piecePlayer) {
         this.id = id;
@@ -208,31 +208,31 @@ $( document ).ready(function() {
             let newPos = boxObj.pos;
             let moveOneRow = Math.abs(parseInt(this.pos[0]) - parseInt(newPos[0]))
             let moveOneColumn = Math.abs(parseInt(this.pos[1]) - parseInt(newPos[1]))
-           
+
             if(this.isKing){
                 return true;
             }// don't bother with the below stuff
             if (this.piecePlayer == 1){
                 if(this.pos[0] < newPos[0]){ // smaller means higher
                     console.log("this is a valid move for p1") // good
-             
+
                     return true
                 }
                 else if (this.pos[0] > newPos[0]){
                     console.log("this is an invalid move for p1") // bad
-       
+
                     return false
                 }
             }
             else if (this.piecePlayer == 2){
                 if(this.pos[0] < newPos[0]){ // smaller means higher
                     console.log("this is an invalid move for p2") // bad
-                   
+
                     return false
                 }
                 else if (this.pos[0] > newPos[0]){
                     console.log("this is a valid move for p2") // good
-                   
+
                     return true
                 }
             }
@@ -286,13 +286,13 @@ $( document ).ready(function() {
         },
 
         this.enemiesDirtyWork = function(rowLookup, columnLookup, dir, enemyPlayer){
-            
+
             let enemy = []
-            
+
             if(Board.getSqareType(rowLookup, columnLookup) == enemyPlayer){
                 targetBoxCoords = this.emptyBoxInRange(rowLookup, columnLookup, dir)
                 if(!(typeof targetBoxCoords == "undefined" || targetBoxCoords == null )){ //here, box = [row, col]
-                    enemy = [Board.getPieceByPosition(rowLookup, columnLookup), 
+                    enemy = [Board.getPieceByPosition(rowLookup, columnLookup),
                                 Board.getBoxByPosition(targetBoxCoords[0], targetBoxCoords[1])] // format: ememies = [pieceObj, boxObj]
                 }
             }
@@ -300,7 +300,7 @@ $( document ).ready(function() {
         },
 
         this.enemiesInRange = function(row, column){
-  
+
             // stil needs the force jump loop
 
             // top-right (p2) -1, +1
@@ -327,7 +327,7 @@ $( document ).ready(function() {
                 if (this.isKing == true){
                     enemies.push(this.enemiesDirtyWork(thisRowUp, thisColumnRight, "topR", 2))
                     enemies.push(this.enemiesDirtyWork(thisRowUp, thisColumnLeft, "topL", 2))
-                } 
+                }
             }
             if(this.piecePlayer == 2){
                 if(this.isKing == true){
@@ -341,9 +341,9 @@ $( document ).ready(function() {
         },
         this.movePiece = function(boxObj){
             newPos = boxObj.pos;
-        
+
             if(Board.isEmptyBox(newPos[0],newPos[1]) && !Board.isGameOver()){
-                Board.updateBoard(0, this.pos[0], this.pos[1]) 
+                Board.updateBoard(0, this.pos[0], this.pos[1])
                 this.pos = newPos // this is extremely important. update the position only after marking the orig pos with 0
                 Board.updateBoard(Board.playerTurn, newPos[0], newPos[1]);
                 $(id).css('top', posToCss[newPos[0]]);
@@ -356,13 +356,19 @@ $( document ).ready(function() {
                     }
                 }
                 Board.changePlayer(Board.playerTurn);
-                Board.printBoard(); 
+                Board.printBoard();
             }
             else{
                 $('.info-text').text("Invalid move: That's an occupied square!");
                 return false;
             }
-            return true;  
+
+            var jsonString = JSON.stringify([piece.piecePlayer, piece.id, box.id, box.pos]);
+
+
+            return true;
+
+
         },
         this.kingSelf = function(){
             this.isKing = true;
@@ -380,7 +386,7 @@ $( document ).ready(function() {
     //initialize the board;
 
 
-    
+
     var Board = new Board(boardConfig, "Alice", "Bob");
     Board.init();
     updateGameScreen();
@@ -388,14 +394,14 @@ $( document ).ready(function() {
     $("#p1-box > span.p-name").text(Board.p1Name)
     $("#p2-box > span:nth-child(1)").text(Board.p2Name)
     $('#maingamescreen').data('old-state', $('#maingamescreen').html()); // store the old html config
-    
-    
+
+
     // var myJSON = JSON.stringify(Board);
     // console.log(myJSON);
-    
+
     $(document).on("click", ".piece",function () {
-        
-      
+
+
         let pieceIDString = null;
         let pieceObj = null;
         let enemiesAround = [];
@@ -433,7 +439,7 @@ $( document ).ready(function() {
         if (Board.isGameOver()){
             $(".info-text").text("Game Over! Player " + Board.playerTurn + " wins the game!" )
             modal.css("display", "flex")
-            
+
         }
         console.log("is it game over?" + Board.isGameOver());
 
@@ -455,11 +461,11 @@ $( document ).ready(function() {
             console.log("p2 loop : " + parseInt(i + 1));
             $("#p2-box > div > span:nth-child(" + parseInt(i + 1) + ")").addClass("dead");
          }
-         
-        
+
+
     }
 
-    $(document).on("click", '.box',function () { 
+    $(document).on("click", '.box',function () {
 
         let pieceIDString = null;
         let boxIDString = null;
@@ -468,7 +474,7 @@ $( document ).ready(function() {
         let enemiesAround = [];
         let boxesAround = [];
 
-        $(this).toggleClass("highlight"); 
+        $(this).toggleClass("highlight");
         $(this).siblings().removeClass('highlight');
 
         //only allow clicking on a box if a piece has been selected.
@@ -500,16 +506,16 @@ $( document ).ready(function() {
                             pieceObj.movePiece(enemiesAround[i][1])
                             updateGameScreen();
                             enemiesAround[i][0].removeSelf();
-                        }                 
+                        }
                     }
                 }
             }
             if (pieceObj.validateMoveByPlayer(boxObj) && pieceObj.validateMoveOneRowCol(boxObj)){
                 pieceObj.movePiece(boxObj);
-                updateGameScreen();  
+                updateGameScreen();
                 $('.info-text').text("Player " +  Board.playerTurn + " to move.");
             }
-        }        
+        }
     });
-   
+
 });
