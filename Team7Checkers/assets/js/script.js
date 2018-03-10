@@ -409,8 +409,8 @@ $( document ).ready(function() {
             }
             return enemies
         },
-        this.movePiece = function(boxObj){
-            newPos = boxObj.pos;
+        this.movePiece = function(boxObjpos){
+            newPos = boxObjpos;
             let moveJSON = null;
         
             if(Board.isEmptyBox(newPos[0],newPos[1]) && !Board.isGameOver()){
@@ -433,7 +433,7 @@ $( document ).ready(function() {
                 $('.info-text').text("Invalid move: That's an occupied square!");
                 return false;
             }
-            moveJSON = JSON.stringify([this.piecePlayer, this.id, this.pos, boxObj.id, boxObj.pos])
+            moveJSON = JSON.stringify([this.piecePlayer, this.id, this.pos, boxObjpos])
             if(connection.readyState == 1){
                 connection.send(moveJSON);
                 console.log(moveJSON);
@@ -573,7 +573,7 @@ $( document ).ready(function() {
                             Board.updateScore();
                             //updateGameScreen();
                             console.log("Tally: 1 has " + Board.p1Score + "and 2 has " + Board.p2Score)
-                            pieceObj.movePiece(enemiesAround[i][1])
+                            pieceObj.movePiece(enemiesAround[i][1].pos)
                             updateGameScreen();
                             enemiesAround[i][0].removeSelf();
                         }                 
@@ -581,7 +581,7 @@ $( document ).ready(function() {
                 }
             }
             if (pieceObj.validateMoveByPlayer(boxObj) && pieceObj.validateMoveOneRowCol(boxObj)){
-                pieceObj.movePiece(boxObj);
+                pieceObj.movePiece(boxObj.pos);
                 updateGameScreen();  
                 $('.info-text').text("Player " +  Board.playerTurn + " to move.");
             }
