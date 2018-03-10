@@ -13,7 +13,9 @@
     "electron-reload": "^1.2.2"
   },
   "dependencies": {
+    "bson": "^2.0.2",
     "electron-fetch": "^1.1.0",
+    "gson": "^0.1.5",
     "ws": "^5.0.0"
   },
   "author": ""
