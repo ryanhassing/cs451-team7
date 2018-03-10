@@ -1,8 +1,77 @@
+const { app, ipcRenderer, remote, BrowserWindow } = require('electron')
 $( document ).ready(function() {
 
+    var WebSocket = require('ws');
+    var connection = null;
 
 
-    
+    //////////////////////////MENU FUNCTIONS///////////////////////////////
+
+
+    $(document).on("click", "#forfeit",function(){
+        $("#modal-screen").css("display", "flex")
+        console.log("hey")
+    })
+    $(document).on("click", ".leave", function(){
+        Board.resetBoard(boardConfig);
+        $("#modal-screen").css("display", "none")
+    })
+    $(document).on("click", "#restart-game", function(){
+        Board.resetBoard(boardConfig);
+    })
+
+    $(document).on("click", "#playtemp", function(){
+
+        var ipInput = "";
+
+        $("#mainmenuscreen > #modal-screen").css("display", "none")
+        ipInput = $("#fname").val();
+
+        console.log("this is IPinput:" + ipInput);
+
+        var url = 'ws://' + ipInput + ':4567/checkers';
+        connection = new WebSocket(url);
+
+        // connection opened
+        connection.addEventListener('open', function(event) {
+            connection.send('Connected.');
+        });
+        
+        // log message
+        connection.addEventListener('message', function(event) {
+            console.log('Message: ', event.data);
+        });
+
+
+
+    })
+    $("#fname").on('keyup', function() {
+        console.log("sdsdsdsdsd")
+        let val = 0
+        if($("#fname").val().length == 0  ){
+            $("#playtemp").prop("disabled", true);
+        }
+        else{
+            $("#playtemp").prop("disabled", false);
+        }
+
+        
+    });
+
+    $(document).on("click", "#cancel-join",function(){
+        $("#mainmenuscreen > #modal-screen").css("display", "none")
+    })
+    $(document).on("click", "#join", function(){
+
+        $("#mainmenuscreen > #modal-screen").css("display", "flex")
+        console.log("hello")
+    })
+
+///////////////////////////////////////////////////////
+
+
+
+
     // the vmin indices translate directly to the pieceObj and boxObj pos variable
     var posToCss = ["0vmin", "10vmin", "20vmin", "30vmin", "40vmin", "50vmin", "60vmin", "70vmin", "80vmin", "90vmin"]
     // right now, only this configuration is supported because visuals are hardcoded in html
@@ -21,6 +90,7 @@ $( document ).ready(function() {
                     [2, -1, 2, -1, 2, -1, 2, -1],
                     [-1, 2, -1, 2, -1, 2, -1, 2],
                     [2, -1, 2, -1, 2, -1, 2, -1]];
+    var PlayerYou = ""// int. if yoy create the game, youre 1. if you join, youre 2. Depending on who you are, you cannot touch another anotehr person's move till you receive the moveJSON from the server. 
     
     function Board(boardConfig, p1Name, p2Name)  {
 
@@ -341,6 +411,7 @@ $( document ).ready(function() {
         },
         this.movePiece = function(boxObj){
             newPos = boxObj.pos;
+            let moveJSON = null;
         
             if(Board.isEmptyBox(newPos[0],newPos[1]) && !Board.isGameOver()){
                 Board.updateBoard(0, this.pos[0], this.pos[1]) 
@@ -362,6 +433,11 @@ $( document ).ready(function() {
                 $('.info-text').text("Invalid move: That's an occupied square!");
                 return false;
             }
+            moveJSON = JSON.stringify([this.piecePlayer, this.id, this.pos, boxObj.id, boxObj.pos])
+            if(connection.readyState == 1){
+                connection.send(moveJSON);
+                console.log(moveJSON);
+            }
             return true;  
         },
         this.kingSelf = function(){
@@ -381,7 +457,7 @@ $( document ).ready(function() {
 
 
     
-    var Board = new Board(boardConfig, "Alice", "Bob");
+    var Board = new Board(boardConfig, remote.getGlobal("something"), "Bob");
     Board.init();
     updateGameScreen();
     console.log("p1:" + Board.p1Name + ", " + Board.p2Name)
@@ -512,4 +588,11 @@ $( document ).ready(function() {
         }        
     });
    
+
+
+
 });
+
+
+
+
