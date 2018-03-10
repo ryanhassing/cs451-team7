@@ -47,5 +47,8 @@
     "husky": "^0.14.3",
     "snazzy": "^7.0.0",
     "standard": "^10.0.3"
+  },
+  "dependencies": {
+    "ws": "^5.0.0"
   }
 }
