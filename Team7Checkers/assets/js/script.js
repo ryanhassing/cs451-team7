@@ -509,6 +509,7 @@ window.onload = function() {
 
     $(document).on("click", "#forfeit",function(){
         $("#modal-screen").css("display", "flex")
+        console.log("hey")
     })
     $(document).on("click", ".leave", function(){
         Board.resetBoard(boardConfig);
@@ -516,6 +517,17 @@ window.onload = function() {
     })
     $(document).on("click", "#restart-game", function(){
         Board.resetBoard(boardConfig);
+    })
+
+
+    // BELOW: perhaps it would be better if main menu js was seperate
+    $(document).on("click", "#cancel-join",function(){
+        $("#mainmenuscreen > #modal-screen").css("display", "none")
+    })
+    $(document).on("click", "#join", function(){
+
+        $("#mainmenuscreen > #modal-screen").css("display", "flex")
+        console.log("hello")
     })
     
     
