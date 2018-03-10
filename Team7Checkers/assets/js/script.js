@@ -1,4 +1,74 @@
+const { app, ipcRenderer, remote, BrowserWindow } = require('electron')
 $( document ).ready(function() {
+
+    var WebSocket = require('ws');
+    var connection = null;
+
+
+    //////////////////////////MENU FUNCTIONS///////////////////////////////
+
+
+    $(document).on("click", "#forfeit",function(){
+        $("#modal-screen").css("display", "flex")
+        console.log("hey")
+    })
+    $(document).on("click", ".leave", function(){
+        Board.resetBoard(boardConfig);
+        $("#modal-screen").css("display", "none")
+    })
+    $(document).on("click", "#restart-game", function(){
+        Board.resetBoard(boardConfig);
+    })
+
+    $(document).on("click", "#playtemp", function(){
+
+        var ipInput = "";
+
+        $("#mainmenuscreen > #modal-screen").css("display", "none")
+        ipInput = $("#fname").val();
+
+        console.log("this is IPinput:" + ipInput);
+
+        var url = 'ws://' + ipInput + ':4567/checkers';
+        connection = new WebSocket(url);
+
+        // connection opened
+        connection.addEventListener('open', function(event) {
+            connection.send('Connected.');
+        });
+
+        // log message
+        connection.addEventListener('message', function(event) {
+            console.log('Message: ', event.data);
+        });
+
+
+
+    })
+    $("#fname").on('keyup', function() {
+        console.log("sdsdsdsdsd")
+        let val = 0
+        if($("#fname").val().length == 0  ){
+            $("#playtemp").prop("disabled", true);
+        }
+        else{
+            $("#playtemp").prop("disabled", false);
+        }
+
+
+    });
+
+    $(document).on("click", "#cancel-join",function(){
+        $("#mainmenuscreen > #modal-screen").css("display", "none")
+    })
+    $(document).on("click", "#join", function(){
+
+        $("#mainmenuscreen > #modal-screen").css("display", "flex")
+        console.log("hello")
+    })
+
+///////////////////////////////////////////////////////
+
 
 
 
@@ -339,9 +409,16 @@ $( document ).ready(function() {
             }
             return enemies
         },
+<<<<<<< HEAD
         this.movePiece = function(boxObj){
             newPos = boxObj.pos;
 
+=======
+        this.movePiece = function(boxObjpos){
+            newPos = boxObjpos;
+            let moveJSON = null;
+
+>>>>>>> 645775f11b53c0718ec944f7b4d732e619e0373f
             if(Board.isEmptyBox(newPos[0],newPos[1]) && !Board.isGameOver()){
                 Board.updateBoard(0, this.pos[0], this.pos[1])
                 this.pos = newPos // this is extremely important. update the position only after marking the orig pos with 0
@@ -362,6 +439,7 @@ $( document ).ready(function() {
                 $('.info-text').text("Invalid move: That's an occupied square!");
                 return false;
             }
+<<<<<<< HEAD
 
             var jsonString = JSON.stringify([piece.piecePlayer, piece.id, box.id, box.pos]);
 
@@ -369,6 +447,14 @@ $( document ).ready(function() {
             return true;
 
 
+=======
+            moveJSON = JSON.stringify([this.piecePlayer, this.id, this.pos, boxObjpos])
+            if(connection.readyState == 1){
+                connection.send(moveJSON);
+                console.log(moveJSON);
+            }
+            return true;
+>>>>>>> 645775f11b53c0718ec944f7b4d732e619e0373f
         },
         this.kingSelf = function(){
             this.isKing = true;
@@ -386,8 +472,13 @@ $( document ).ready(function() {
     //initialize the board;
 
 
+<<<<<<< HEAD
 
     var Board = new Board(boardConfig, "Alice", "Bob");
+=======
+
+    var Board = new Board(boardConfig, remote.getGlobal("something"), "Bob");
+>>>>>>> 645775f11b53c0718ec944f7b4d732e619e0373f
     Board.init();
     updateGameScreen();
     console.log("p1:" + Board.p1Name + ", " + Board.p2Name)
@@ -503,7 +594,7 @@ $( document ).ready(function() {
                             Board.updateScore();
                             //updateGameScreen();
                             console.log("Tally: 1 has " + Board.p1Score + "and 2 has " + Board.p2Score)
-                            pieceObj.movePiece(enemiesAround[i][1])
+                            pieceObj.movePiece(enemiesAround[i][1].pos)
                             updateGameScreen();
                             enemiesAround[i][0].removeSelf();
                         }
@@ -511,11 +602,28 @@ $( document ).ready(function() {
                 }
             }
             if (pieceObj.validateMoveByPlayer(boxObj) && pieceObj.validateMoveOneRowCol(boxObj)){
+<<<<<<< HEAD
                 pieceObj.movePiece(boxObj);
                 updateGameScreen();
+=======
+                pieceObj.movePiece(boxObj.pos);
+                updateGameScreen();
+>>>>>>> 645775f11b53c0718ec944f7b4d732e619e0373f
                 $('.info-text').text("Player " +  Board.playerTurn + " to move.");
             }
         }
     });
+<<<<<<< HEAD
 
 });
+=======
+
+
+
+
+});
+
+
+
+
+>>>>>>> 645775f11b53c0718ec944f7b4d732e619e0373f
