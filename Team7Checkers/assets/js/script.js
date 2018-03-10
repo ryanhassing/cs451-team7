@@ -2,7 +2,7 @@ const { app, ipcRenderer, remote, BrowserWindow } = require('electron')
 $( document ).ready(function() {
 
     var WebSocket = require('ws');
-    var connection = null;
+    var connection;
 
 
     //////////////////////////MENU FUNCTIONS///////////////////////////////
@@ -34,17 +34,18 @@ $( document ).ready(function() {
 
         // connection opened
         connection.addEventListener('open', function(event) {
-            connection.send('Connected.');
+            // connection.send('{"msg" : "connected"}');
+            console.log("Connected to server")
         });
         
         // log message
         connection.addEventListener('message', function(event) {
-            console.log('Message: ', event.data);
+            jsonToMove(event.data);
+            console.log('Message from server: ', event.data);
+           
         });
-
-
-
     })
+
     $("#fname").on('keyup', function() {
         console.log("sdsdsdsdsd")
         let val = 0
@@ -92,16 +93,14 @@ $( document ).ready(function() {
                     [2, -1, 2, -1, 2, -1, 2, -1]];
     var PlayerYou = ""// int. if yoy create the game, youre 1. if you join, youre 2. Depending on who you are, you cannot touch another anotehr person's move till you receive the moveJSON from the server. 
     
-    function Board(boardConfig, p1Name, p2Name)  {
+    function Board(boardConfig)  {
 
         this.board = boardConfig;
-        this.p1Name = p1Name;
-        this.p2Name = p2Name;
         this.p1Score = 0;
         this.p2Score = 0;
         this.boxes = [],
         this.pieces = [],
-        this.playerTurn = (Math.random() <= 0.5) ? 1 : 2; //random player starts
+        this.playerTurn = 1 //player one, the creator of the game room  
         // we need a game id here
 
         this.init = function() {
@@ -290,7 +289,7 @@ $( document ).ready(function() {
                 }
                 else if (this.pos[0] > newPos[0]){
                     console.log("this is an invalid move for p1") // bad
-       
+
                     return false
                 }
             }
@@ -412,6 +411,7 @@ $( document ).ready(function() {
         this.movePiece = function(boxObjpos){
             newPos = boxObjpos;
             let moveJSON = null;
+            let originalPos = this.pos;
         
             if(Board.isEmptyBox(newPos[0],newPos[1]) && !Board.isGameOver()){
                 Board.updateBoard(0, this.pos[0], this.pos[1]) 
@@ -433,7 +433,7 @@ $( document ).ready(function() {
                 $('.info-text').text("Invalid move: That's an occupied square!");
                 return false;
             }
-            moveJSON = JSON.stringify([this.piecePlayer, this.id, this.pos, boxObjpos])
+            moveJSON = JSON.stringify({"player" : this.piecePlayer, "id" : this.id, "position" : originalPos, "box": boxObjpos });
             if(connection.readyState == 1){
                 connection.send(moveJSON);
                 console.log(moveJSON);
@@ -457,21 +457,45 @@ $( document ).ready(function() {
 
 
     
-    var Board = new Board(boardConfig, remote.getGlobal("something"), "Bob");
+    var Board = new Board(boardConfig);
     Board.init();
+    console.log("PLAYER'S turn: " + Board.playerTurn)
     updateGameScreen();
-    console.log("p1:" + Board.p1Name + ", " + Board.p2Name)
-    $("#p1-box > span.p-name").text(Board.p1Name)
-    $("#p2-box > span:nth-child(1)").text(Board.p2Name)
-    $('#maingamescreen').data('old-state', $('#maingamescreen').html()); // store the old html config
+    $('#maingamescreen').data('old-state', $('#maingamescreen').html()); // store the old html config for reset
     
-    
-    // var myJSON = JSON.stringify(Board);
-    // console.log(myJSON);
-    
-    $(document).on("click", ".piece",function () {
+    function updateGameScreen(){
+
+        if (Board.isGameOver()){
+            $(".info-text").text("Game Over! Player " + Board.playerTurn + " wins the game!" )
+            modal.css("display", "flex")
+            
+        }
+        console.log("is it game over?" + Board.isGameOver());
+
+        if(Board.playerTurn == 1){
+            $("#p1-box").addClass("playing")
+            $("#p2-box").removeClass("playing")
+        }
+        else if(Board.playerTurn == 2){
+            $("#p2-box").addClass("playing")
+            $("#p1-box").removeClass("playing")
+        }
+
+         for(let i = 0; i < Board.p1Score; i++){
+            console.log("p1 loop : " + parseInt(i + 1));
+            $("#p1-box > div > span:nth-child(" + parseInt(i + 1) + ")").addClass("dead");
+         }
+
+         for(let i = 0; i < Board.p2Score; i++){
+            console.log("p2 loop : " + parseInt(i + 1));
+            $("#p2-box > div > span:nth-child(" + parseInt(i + 1) + ")").addClass("dead");
+         }
+         
         
-      
+    }
+
+        
+    $(document).on("click", ".piece",function () {
         let pieceIDString = null;
         let pieceObj = null;
         let enemiesAround = [];
@@ -503,37 +527,6 @@ $( document ).ready(function() {
             $('.info-text').text("It's Player " + Board.playerTurn + "'s turn!");
         }
       });
-
-    function updateGameScreen(){
-
-        if (Board.isGameOver()){
-            $(".info-text").text("Game Over! Player " + Board.playerTurn + " wins the game!" )
-            modal.css("display", "flex")
-            
-        }
-        console.log("is it game over?" + Board.isGameOver());
-
-        if(Board.playerTurn == 1){
-            $("#p1-box").addClass("playing")
-            $("#p2-box").removeClass("playing")
-        }
-        else if(Board.playerTurn == 2){
-            $("#p2-box").addClass("playing")
-            $("#p1-box").removeClass("playing")
-        }
-
-         for(let i = 0; i < Board.p1Score; i++){
-            console.log("p1 loop : " + parseInt(i + 1));
-            $("#p1-box > div > span:nth-child(" + parseInt(i + 1) + ")").addClass("dead");
-         }
-
-         for(let i = 0; i < Board.p2Score; i++){
-            console.log("p2 loop : " + parseInt(i + 1));
-            $("#p2-box > div > span:nth-child(" + parseInt(i + 1) + ")").addClass("dead");
-         }
-         
-        
-    }
 
     $(document).on("click", '.box',function () { 
 
@@ -587,12 +580,39 @@ $( document ).ready(function() {
             }
         }        
     });
-   
 
 
+
+
+
+
+    function jsonToMove(json){
+        //var json = {"move":{"box":[3,2],"id":"#p8","position":[2,1],"player":1}};
+       
+
+      //  console.log(json);
+
+        if (typeof json.user!= "undefined"){
+            console.log("LOOK HERE THIS IS USER");
+            console.log("User is"+ json.user);
+        }
+        if (typeof json.move!="underfined"){
+            console.log("move is: " + json )
+        }
+        // else if (typeof json.move.msg == "undefined") {
+        //     console.log("LOOK HERE THIS IS MOVE");
+        //     console.log(json.move.player);
+        
+        // }
+        else{
+            console.log("THIS IS IT: " + json);
+        }
+    }
+
+
+    
 
 });
-
 
 
 
