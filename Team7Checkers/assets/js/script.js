@@ -1,4 +1,6 @@
-window.onload = function() {
+$( document ).ready(function() {
+
+
 
     
     // the vmin indices translate directly to the pieceObj and boxObj pos variable
@@ -376,7 +378,10 @@ window.onload = function() {
 
     ///// I suppose this is the main() ///////
     //initialize the board;
-    var Board = new Board(boardConfig,"Alice", "Bob");
+
+
+    
+    var Board = new Board(boardConfig, "Alice", "Bob");
     Board.init();
     updateGameScreen();
     console.log("p1:" + Board.p1Name + ", " + Board.p2Name)
@@ -506,29 +511,5 @@ window.onload = function() {
             }
         }        
     });
-
-    $(document).on("click", "#forfeit",function(){
-        $("#modal-screen").css("display", "flex")
-        console.log("hey")
-    })
-    $(document).on("click", ".leave", function(){
-        Board.resetBoard(boardConfig);
-        $("#modal-screen").css("display", "none")
-    })
-    $(document).on("click", "#restart-game", function(){
-        Board.resetBoard(boardConfig);
-    })
-
-
-    // BELOW: perhaps it would be better if main menu js was seperate
-    $(document).on("click", "#cancel-join",function(){
-        $("#mainmenuscreen > #modal-screen").css("display", "none")
-    })
-    $(document).on("click", "#join", function(){
-
-        $("#mainmenuscreen > #modal-screen").css("display", "flex")
-        console.log("hello")
-    })
-    
-    
-}
+   
+});

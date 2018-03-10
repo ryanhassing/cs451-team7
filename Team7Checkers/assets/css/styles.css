@@ -353,11 +353,13 @@ div#board .box {
 }
 
 .newh1{
-    font-size: 6vmin;
+    font-size: 35px;
     font-weight: bold;
     padding: 0;
     margin: 0;
 }
+
+
 
 #maingamescreen > div.container > div.nav > div:nth-child(5){
 	margin-top: auto;

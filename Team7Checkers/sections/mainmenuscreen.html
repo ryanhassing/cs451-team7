@@ -3,28 +3,29 @@
         
             <div id="modal-screen" class="modal">
 
-                    <!-- Modal content -->
-                    <div class="modal-content">
-                           
-                        <div class="aligner">
+                <!-- Modal content -->
+                <div class="modal-content">
                         
-                        <p class="newh1">Enter your name:</p>
-
-                                    <input type="text" name="fname"><br> <!--channge to span so on same line as button-->
-                                    <button class="buttongame">Play!</button>
-                               
-                        <p>This text changes to "waitinfg for another player" if game is created </p> 
-                        <p>this is actually supposed to appear when you click play game</p> 
-                        <div>
+                    <div class="aligner">
+                    
+                    <p class="newh2">Enter your name:</p>
+                    <input type="text" id="fname" value="" maxlength="15" minlength="0">
+                    <p class="newh2">Enter an IP:</p>
+                    <input type="text" id="fip" value=""  maxlength="50" minlength="0">
+                    <br>
+                    <div class="actions">
+                      
                         <button id="cancel-join" class="buttongame" >Cancel</button>
+                        <button disabled data-section="maingamescreen" id="playtemp" class="buttongame" >Play!</button>           
                     </div>
                     </div>
-                    </div>
+                </div>
                 
                 </div>
  
             <div class="menu-aligner">
                     <p class="t7c-title">Team 7 Checkers</p>
+                    
                 <button data-section="maingamescreen"class="menu-button">Play Checkers!</button> 
                 <button data-section="rulesscreen" class="menu-button">Rules</button>  
                 <button id="join" class="menu-button">Exit</button>
