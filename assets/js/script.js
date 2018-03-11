@@ -82,13 +82,21 @@ $( document ).ready(function() {
 
     connection.onmessage = function(e){
         let didTheyMove = false
+        let nr = null;
+        let nc = null;
         setTimeout(function(){ didTheyMove = otherPlayerMove(playerYou);
         
             if(didTheyMove == true){
             console.log("moveJSON: " + moveJson)
-               p = Board.getPieceByPosition(moveJson.positon)
+                sliceID = moveJson.id.slice(1)
+                console.log("ID WITHOUT HASH: " + sliceID);
+               p = Board.getPieceByIDString(sliceID)
                console.log("this was the piece obj")
                console.log(p); 
+               nr = moveJson.box[0]
+               nc = moveJson.box[1]
+               console.log("NR NC: " + nr + "," + nc)
+               console.log(p.movePiece(nr, nc));
             }
         
         }, 1000);
@@ -216,6 +224,15 @@ $( document ).ready(function() {
                 }
             }
         },
+        this.getPieceByIDString = function(IDString){ // get it from calling the dom $(this).attr("id")
+            for (element in this.pieces) {
+                if(this.pieces[element].id == '#' + IDString){
+                    row = this.pieces[element].pos[0];
+                    column = this.pieces[element].pos[1];
+                    return this.pieces[element];
+                }
+            }
+        },
         this.getSqareType = function (row, column){
 
             if(row in this.board && column in this.board){ 
@@ -261,6 +278,17 @@ $( document ).ready(function() {
             }
             else if (currentPlayer == 2){
                 this.playerTurn = 1
+            }
+            else{
+                alert("this is not supposed to happen")
+            }
+        },
+        this.changeYou = function(you){
+            if (you == 1){
+                playerYou = 2
+            }
+            else if (you == 2){
+                playerYou = 1
             }
             else{
                 alert("this is not supposed to happen")
@@ -463,7 +491,7 @@ $( document ).ready(function() {
             newPos = boxObjpos;
             let moveJSON = null;
             let originalPos = this.pos;
-        
+            
             if(Board.isEmptyBox(newPos[0],newPos[1]) && !Board.isGameOver()){
                 Board.updateBoard(0, this.pos[0], this.pos[1]) 
                 this.pos = newPos // this is extremely important. update the position only after marking the orig pos with 0
@@ -478,12 +506,13 @@ $( document ).ready(function() {
                     }
                 }
                 Board.changePlayer(Board.playerTurn);
+               // Board.changeYou(playerYou); //TESTING PURPOSES ONLY
                 Board.printBoard(); 
             }
             else{
-                $('.info-text').text("Invalid move: That's an occupied square!");
                 return false;
             }
+
             moveJSON = JSON.stringify({"player" : this.piecePlayer, "id" : this.id, "position" : originalPos, "box": boxObjpos });
             if(connection.readyState == 1){
                 connection.send(moveJSON);
@@ -491,6 +520,16 @@ $( document ).ready(function() {
             }
             return true;  
         },
+        this.moveNoVal = function(boxObjpos){
+            newPos = boxObjpos;
+            Board.updateBoard(0, this.pos[0], this.pos[1])
+            this.pos = newPos // this is extremely important. update the position only after marking the orig pos with 0
+            Board.updateBoard(Board.playerTurn, newPos[0], newPos[1]);
+            $(id).css('top', posToCss[newPos[0]]);
+            $(id).css('left', posToCss[newPos[1]]);
+            // $(id).removeClass('highlight');
+
+        }
         this.kingSelf = function(){
             this.isKing = true;
             $(id).addClass("king")
@@ -550,9 +589,11 @@ $( document ).ready(function() {
         let pieceIDString = null;
         let pieceObj = null;
         let enemiesAround = [];
-        let isPlayerTurn = ($(this).parent().attr("class") == "player" + Board.playerTurn);
+        let isPlayerTurn = ($(this).parent().attr("class") == "player" + Board.playerTurn); // single player
 
-        if(isPlayerTurn == true){
+
+        //if(isPlayerTurn == true ){
+        if(isPlayerTurn == true && playerYou == Board.playerTurn){
             $(this).toggleClass('highlight');
             $(this).siblings().removeClass('highlight');
 
@@ -619,7 +660,9 @@ $( document ).ready(function() {
                             Board.updateScore();
                             //updateGameScreen();
                             console.log("Tally: 1 has " + Board.p1Score + "and 2 has " + Board.p2Score)
-                            pieceObj.movePiece(enemiesAround[i][1].pos)
+                                
+                                pieceObj.movePiece(enemiesAround[i][1].pos)
+                            
                             
                             updateGameScreen();
                             enemiesAround[i][0].removeSelf();
