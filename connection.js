@@ -30,21 +30,22 @@ var connectFromInit = function(username, ip) {
 
   // assume all messages will be moves of the form below
   connection.addEventListener('message', function(event) {
-    var data = JSON.parse(event.data);
-    var user = data[0];
+    // var data = JSON.parse(event.data);
+    // var user = data[0];
+    console.log(event.data);
 
-    // we don't have to do anything if this player made the move
-    if (username != user) {
-      var pieceID = data[1];
-      var boxID = data[2];
-
-      // make the move based on this info
-    }
+    // // we don't have to do anything if this player made the move
+    // if (username != user) {
+    //   var pieceID = data[1];
+    //   var boxID = data[2];
+    //
+    //   // make the move based on this info
+    // }
   });
 }
 
 // connectFromInit('player1', '10.250.9.50');
 
-var moveJSON = function(piece, box) {
-  return JSON.stringify([piece.piecePlayer, piece.id, box.id]);
-}
+// var moveJSON = function(piece, box) {
+//   return JSON.stringify([piece.piecePlayer, piece.id, box.id, box.pos]);
+// }
