@@ -1,54 +1,22 @@
 {
-  "name": "cs451-team7",
-  "version": "0.0.0",
-  "license": "UNLICENSED",
-  "description": "A checkers game for CS 451 at Drexel University",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ehegnes/cs451-team7.git"
-  },
-  "bugs": {
-    "url": "https://github.com/ehegnes/cs451-team7/issues"
-  },
-  "homepage": "https://github.com/ehegnes/cs451-team7#README.md",
-  "private": true,
-  "contributors": [
-    {
-      "name": "Aman Agrawal",
-      "email": "aa3539@drexel.edu"
-    },
-    {
-      "name": "Eric Hegnes",
-      "email": "edh45@drexl.edu"
-    },
-    {
-      "name": "Ryan Hassing",
-      "email": "rhh36@drexel.edu"
-    },
-    {
-      "name": "Yongchang Cai",
-      "email": "yc552@drexel.edu"
-    },
-    {
-      "name": "Zara Zahimi",
-      "email": "zz365@drexel.edu"
-    }
-  ],
-  "directories": {
-    "doc": "docs"
-  },
+  "name": "team-7-checkers",
+  "version": "1.0.0",
+  "description": "Checkers application for CS451",
+  "main": "main.js",
   "scripts": {
-    "precommit": "standard --fix --verbose | snazzy",
-    "commitmsg": "commitlint -e $GIT_PARAMS"
+    "start": "electron ."
   },
+  "license": "CC0-1.0",
   "devDependencies": {
-    "@commitlint/cli": "^6.0.2",
-    "@commitlint/config-conventional": "^6.0.2",
-    "husky": "^0.14.3",
-    "snazzy": "^7.0.0",
-    "standard": "^10.0.3"
+    "devtron": "^1.4.0",
+    "electron": "~1.7.8",
+    "electron-reload": "^1.2.2"
   },
   "dependencies": {
+    "bson": "^2.0.2",
+    "electron-fetch": "^1.1.0",
+    "gson": "^0.1.5",
     "ws": "^5.0.0"
-  }
+  },
+  "author": ""
 }
