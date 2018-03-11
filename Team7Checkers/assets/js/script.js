@@ -40,8 +40,23 @@ $( document ).ready(function() {
         
         // log message
         connection.addEventListener('message', function(event) {
-            jsonToMove(event.data);
-            console.log('Message from server: ', event.data);
+            //jsonToMove(event.data);
+            let json = event.data;
+            // console.log("HERE");
+            // console.log(event.data);
+            console.log(json)
+            console.log("user: " + json.user);
+            console.log("move: " + json.move);
+
+            // if (json.user!=undefined){
+            //     console.log("user");
+            //     console.log(json.user);
+            //    }
+            //    else {
+            //     console.log("move");
+            //     console.log(json.move.player);
+            //    }
+            // console.log('Message from server: ', event.data);
            
         });
     })
@@ -91,7 +106,7 @@ $( document ).ready(function() {
                     [2, -1, 2, -1, 2, -1, 2, -1],
                     [-1, 2, -1, 2, -1, 2, -1, 2],
                     [2, -1, 2, -1, 2, -1, 2, -1]];
-    var PlayerYou = ""// int. if yoy create the game, youre 1. if you join, youre 2. Depending on who you are, you cannot touch another anotehr person's move till you receive the moveJSON from the server. 
+    var PlayerYou = 1// int. if yoy create the game, youre 1. if you join, youre 2. Depending on who you are, you cannot touch another anotehr person's move till you receive the moveJSON from the server. 
     
     function Board(boardConfig)  {
 
@@ -590,24 +605,46 @@ $( document ).ready(function() {
         //var json = {"move":{"box":[3,2],"id":"#p8","position":[2,1],"player":1}};
        
 
-      //  console.log(json);
+    //   //  console.log(json);
 
-        if (typeof json.user!= "undefined"){
-            console.log("LOOK HERE THIS IS USER");
-            console.log("User is"+ json.user);
-        }
-        if (typeof json.move!="underfined"){
-            console.log("move is: " + json )
-        }
-        // else if (typeof json.move.msg == "undefined") {
-        //     console.log("LOOK HERE THIS IS MOVE");
-        //     console.log(json.move.player);
+    //     if (typeof json.user!= "undefined"){
+    //         console.log("LOOK HERE THIS IS USER");
+    //         console.log("User is"+ json.user);
+    //     }
+    //     if (typeof json.move!="undefined"){
+    //         console.log("move is: " + json )
+    //     }
+    //     // else if (typeof json.move.msg == "undefined") {
+    //     //     console.log("LOOK HERE THIS IS MOVE");
+    //     //     console.log(json.move.player);
         
-        // }
-        else{
-            console.log("THIS IS IT: " + json);
-        }
+    //     // }
+    //     else{
+    //         console.log("THIS IS IT: " + json);
+    //         obj = JSON.parse(json);
+    //         console.log("obj move: " + obj.move.id);
+
+    //     }
+
+
+    if (json.user!=undefined){
+        console.log("user");
+        console.log(json.user);
+       }
+       else {
+        console.log("move");
+        console.log(json.move.player);
+       }
     }
+
+
+    ///////////////////////// TAKE TURNS OVER WEB LOGIC.
+    // if(playerYou == 1){
+    //     //blah blah blah
+    // }
+    // else if(playerYou == 2){
+        
+    // }
 
 
     
