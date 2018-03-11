@@ -1,0 +1,63 @@
+{
+  "name": "team-7-checkers",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "Checkers application for CS451",
+  "contributors": [
+    {
+      "name": "Aman Agrawal",
+      "email": "aa3539@drexel.edu"
+    },
+    {
+      "name": "Ryan Hassing",
+      "email": "rhh36@drexel.edu"
+    },
+    {
+      "name": "Yongchang Cai",
+      "email": "yc552@drexel.edu"
+    },
+    {
+      "name": "Zara Zahimi",
+      "email": "zz365@drexel.edu"
+    }
+  ],
+  "main": "./app/main.js",
+  "scripts": {
+    "postinstall": "electron-builder install-app-deps",
+    "start": "npm install && electron ./app",
+    "pack": "build --dir",
+    "dist": "build"
+  },
+  "build": {
+    "appId": "team-7-checkers",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "NSIS",
+      "icon": "build/icon.ico"
+    }
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest"
+  }
+}
