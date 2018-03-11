@@ -2,7 +2,9 @@ const { app, ipcRenderer, remote, BrowserWindow } = require('electron')
 $( document ).ready(function() {
 
     var WebSocket = require('ws');
-    var connection = null;
+    var connection;
+    var moveJson;
+    var playerYou = 1
 
 
     //////////////////////////MENU FUNCTIONS///////////////////////////////
@@ -34,17 +36,66 @@ $( document ).ready(function() {
 
         // connection opened
         connection.addEventListener('open', function(event) {
-            connection.send('Connected.');
+            // connection.send('{"msg" : "connected"}');
+            console.log("Connected to server")
         });
 
         // log message
         connection.addEventListener('message', function(event) {
-            console.log('Message: ', event.data);
+            //jsonToMove(event.data);
+            let json = event.data;
+            // console.log("HERE");
+            // console.log(event.data);
+            json = JSON.parse(json)
+            console.log(json)
+            console.log("user: " + json.user);
+            console.log("move: " + json.move);
+            console.log(json.move);
+            moveJson =  json.move;
         });
-
-
-
     })
+
+    var url = 'ws://10.250.9.50:4567/checkers';
+    connection = new WebSocket(url);
+
+    // connection opened
+    connection.addEventListener('open', function(event) {
+        // connection.send('{"msg" : "connected"}');
+        console.log("Connected to server")
+    });
+
+    // log message
+    connection.addEventListener('message', function(event) {
+        //jsonToMove(event.data);
+        let json = event.data;
+        // console.log("HERE");
+        // console.log(event.data);
+        json = JSON.parse(json)
+        console.log(json)
+        console.log("user: " + json.user);
+        console.log("move: " + json.move);
+        console.log(json.move);
+        moveJson =  json.move;
+
+
+    });
+
+    connection.onmessage = function(e){
+        let didTheyMove = false
+        setTimeout(function(){ didTheyMove = otherPlayerMove(playerYou);
+
+            if(didTheyMove == true){
+               p = Board.getPieceByPosition(moveJson)
+               console.log("this was the piece obj")
+               console.log(p);
+            }
+
+        }, 1000);
+
+     }
+
+
+
     $("#fname").on('keyup', function() {
         console.log("sdsdsdsdsd")
         let val = 0
@@ -72,7 +123,6 @@ $( document ).ready(function() {
 
 
 
-
     // the vmin indices translate directly to the pieceObj and boxObj pos variable
     var posToCss = ["0vmin", "10vmin", "20vmin", "30vmin", "40vmin", "50vmin", "60vmin", "70vmin", "80vmin", "90vmin"]
     // right now, only this configuration is supported because visuals are hardcoded in html
@@ -91,17 +141,16 @@ $( document ).ready(function() {
                     [2, -1, 2, -1, 2, -1, 2, -1],
                     [-1, 2, -1, 2, -1, 2, -1, 2],
                     [2, -1, 2, -1, 2, -1, 2, -1]];
+    // int. if yoy create the game, youre 1. if you join, youre 2. Depending on who you are, you cannot touch another anotehr person's move till you receive the moveJSON from the server.
 
-    function Board(boardConfig, p1Name, p2Name)  {
+    function Board(boardConfig)  {
 
         this.board = boardConfig;
-        this.p1Name = p1Name;
-        this.p2Name = p2Name;
         this.p1Score = 0;
         this.p2Score = 0;
         this.boxes = [],
         this.pieces = [],
-        this.playerTurn = (Math.random() <= 0.5) ? 1 : 2; //random player starts
+        this.playerTurn = 1 //player one, the creator of the game room
         // we need a game id here
 
         this.init = function() {
@@ -409,16 +458,11 @@ $( document ).ready(function() {
             }
             return enemies
         },
-<<<<<<< HEAD
-        this.movePiece = function(boxObj){
-            newPos = boxObj.pos;
-
-=======
         this.movePiece = function(boxObjpos){
             newPos = boxObjpos;
             let moveJSON = null;
+            let originalPos = this.pos;
 
->>>>>>> 645775f11b53c0718ec944f7b4d732e619e0373f
             if(Board.isEmptyBox(newPos[0],newPos[1]) && !Board.isGameOver()){
                 Board.updateBoard(0, this.pos[0], this.pos[1])
                 this.pos = newPos // this is extremely important. update the position only after marking the orig pos with 0
@@ -439,22 +483,12 @@ $( document ).ready(function() {
                 $('.info-text').text("Invalid move: That's an occupied square!");
                 return false;
             }
-<<<<<<< HEAD
-
-            var jsonString = JSON.stringify([piece.piecePlayer, piece.id, box.id, box.pos]);
-
-
-            return true;
-
-
-=======
-            moveJSON = JSON.stringify([this.piecePlayer, this.id, this.pos, boxObjpos])
+            moveJSON = JSON.stringify({"player" : this.piecePlayer, "id" : this.id, "position" : originalPos, "box": boxObjpos });
             if(connection.readyState == 1){
                 connection.send(moveJSON);
                 console.log(moveJSON);
             }
             return true;
->>>>>>> 645775f11b53c0718ec944f7b4d732e619e0373f
         },
         this.kingSelf = function(){
             this.isKing = true;
@@ -472,58 +506,12 @@ $( document ).ready(function() {
     //initialize the board;
 
 
-<<<<<<< HEAD
 
-    var Board = new Board(boardConfig, "Alice", "Bob");
-=======
-
-    var Board = new Board(boardConfig, remote.getGlobal("something"), "Bob");
->>>>>>> 645775f11b53c0718ec944f7b4d732e619e0373f
+    var Board = new Board(boardConfig);
     Board.init();
+    console.log("PLAYER'S turn: " + Board.playerTurn)
     updateGameScreen();
-    console.log("p1:" + Board.p1Name + ", " + Board.p2Name)
-    $("#p1-box > span.p-name").text(Board.p1Name)
-    $("#p2-box > span:nth-child(1)").text(Board.p2Name)
-    $('#maingamescreen').data('old-state', $('#maingamescreen').html()); // store the old html config
-
-
-    // var myJSON = JSON.stringify(Board);
-    // console.log(myJSON);
-
-    $(document).on("click", ".piece",function () {
-
-
-        let pieceIDString = null;
-        let pieceObj = null;
-        let enemiesAround = [];
-        let isPlayerTurn = ($(this).parent().attr("class") == "player" + Board.playerTurn);
-
-        if(isPlayerTurn == true){
-            $(this).toggleClass('highlight');
-            $(this).siblings().removeClass('highlight');
-
-            //below is a repeat from box onclick func. see if you can make a function for it
-            // we may need this in the future to force a jump
-            // other than that it merely outputs to console
-            pieceIDString = $( ".piece" ).filter( document.getElementsByClassName( "highlight" )).attr("id");
-            for(element in Board.pieces){
-                if(Board.pieces[element].id == "#" + pieceIDString){
-                    pieceObj = Board.pieces[element];
-                }
-            }
-            if(!!pieceObj){ // if not null
-                enemiesAround = pieceObj.enemiesInRange().slice();
-                if(!(enemiesAround == undefined || enemiesAround.length == 0)){
-                console.log("YOU CAN KILL HIM HERE")
-                // at this point, the piece does not obey the row1 col1 rule. now it obeys the row2 col2 rule
-                // but the piece MUST land at the returned empty box
-                }
-            }
-        }
-        else{
-            $('.info-text').text("It's Player " + Board.playerTurn + "'s turn!");
-        }
-      });
+    $('#maingamescreen').data('old-state', $('#maingamescreen').html()); // store the old html config for reset
 
     function updateGameScreen(){
 
@@ -556,7 +544,43 @@ $( document ).ready(function() {
 
     }
 
+
+    $(document).on("click", ".piece",function () {
+        let pieceIDString = null;
+        let pieceObj = null;
+        let enemiesAround = [];
+        let isPlayerTurn = ($(this).parent().attr("class") == "player" + Board.playerTurn);
+
+        if(isPlayerTurn == true){
+            $(this).toggleClass('highlight');
+            $(this).siblings().removeClass('highlight');
+
+            //below is a repeat from box onclick func. see if you can make a function for it
+            // we may need this in the future to force a jump
+            // other than that it merely outputs to console
+            pieceIDString = $( ".piece" ).filter( document.getElementsByClassName( "highlight" )).attr("id");
+            for(element in Board.pieces){
+                if(Board.pieces[element].id == "#" + pieceIDString){
+                    pieceObj = Board.pieces[element];
+                }
+            }
+            if(!!pieceObj){ // if not null
+                enemiesAround = pieceObj.enemiesInRange().slice();
+                if(!(enemiesAround == undefined || enemiesAround.length == 0)){
+                console.log("YOU CAN KILL HIM HERE")
+                // at this point, the piece does not obey the row1 col1 rule. now it obeys the row2 col2 rule
+                // but the piece MUST land at the returned empty box
+                }
+            }
+        }
+        else{
+            $('.info-text').text("It's Player " + Board.playerTurn + "'s turn!");
+        }
+      });
+
     $(document).on("click", '.box',function () {
+
+
 
         let pieceIDString = null;
         let boxIDString = null;
@@ -595,6 +619,7 @@ $( document ).ready(function() {
                             //updateGameScreen();
                             console.log("Tally: 1 has " + Board.p1Score + "and 2 has " + Board.p2Score)
                             pieceObj.movePiece(enemiesAround[i][1].pos)
+
                             updateGameScreen();
                             enemiesAround[i][0].removeSelf();
                         }
@@ -602,28 +627,58 @@ $( document ).ready(function() {
                 }
             }
             if (pieceObj.validateMoveByPlayer(boxObj) && pieceObj.validateMoveOneRowCol(boxObj)){
-<<<<<<< HEAD
-                pieceObj.movePiece(boxObj);
-                updateGameScreen();
-=======
                 pieceObj.movePiece(boxObj.pos);
+
                 updateGameScreen();
->>>>>>> 645775f11b53c0718ec944f7b4d732e619e0373f
                 $('.info-text').text("Player " +  Board.playerTurn + " to move.");
             }
         }
     });
-<<<<<<< HEAD
+
+
+
+
+
+
+    function jsonToMove(json){
+        //var json = {"move":{"box":[3,2],"id":"#p8","position":[2,1],"player":1}};
+
+
+        if(typeof moveJson != "undefined"){
+            console.log(moveJson.id)
+            console.log(moveJson.position)
+            console.log(moveJson.player)
+            console.log(moveJson.box)
+            return moveJson
+        }
+
+    }
+
+
+    ///////////////////////// TAKE TURNS OVER WEB LOGIC.
+    function otherPlayerMove(you){
+
+        if (jsonToMove(moveJson).player == you){
+            console.log("You made this move!")
+            console.log("this was the piece id: " + moveJson.id)
+            console.log("this was the target box: " + moveJson.box)
+            console.log("this was the piece orig pos: " + moveJson.position)
+            console.log("this was the movejson.player: " + moveJson.player)
+            return false
+
+        }
+        else{
+            console.log("you did not make this move")
+            console.log("this was the piece id: " + moveJson.id)
+            console.log("this was the target box: " + moveJson.box)
+            console.log("this was the piece orig pos: " + moveJson.position)
+            console.log("this was the movejson.player: " + moveJson.player)
+            return true
+        }
+
+    }
+
+
+
 
 });
-=======
-
-
-
-
-});
-
-
-
-
->>>>>>> 645775f11b53c0718ec944f7b4d732e619e0373f
