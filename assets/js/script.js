@@ -9,10 +9,11 @@ $( document ).ready(function() {
 
     //////////////////////////MENU FUNCTIONS///////////////////////////////
 
-
+    $(document).on("click", "#exit",function(){
+        remote.getCurrentWindow().close()
+    })
     $(document).on("click", "#forfeit",function(){
         $("#modal-screen").css("display", "flex")
-        console.log("hey")
     })
     $(document).on("click", ".leave", function(){
         Board.resetBoard(boardConfig);
@@ -31,31 +32,9 @@ $( document ).ready(function() {
 
         console.log("this is IPinput:" + ipInput);
 
-        var url = 'ws://' + ipInput + ':4567/checkers';
-        connection = new WebSocket(url);
-
-        // connection opened
-        connection.addEventListener('open', function(event) {
-            // connection.send('{"msg" : "connected"}');
-            console.log("Connected to server")
-        });
-        
-        // log message
-        connection.addEventListener('message', function(event) {
-            //jsonToMove(event.data);
-            let json = event.data;
-            // console.log("HERE");
-            // console.log(event.data);
-            json = JSON.parse(json)
-            console.log(json)
-            console.log("user: " + json.user);
-            console.log("move: " + json.move);
-            console.log(json.move);
-            moveJson =  json.move;
-        });
     })
 
-    var url = 'ws://10.250.9.50:4567/checkers';
+    var url = 'ws://cs451team7server.herokuapp.com/checkers';
     connection = new WebSocket(url);
 
     // connection opened
@@ -71,37 +50,52 @@ $( document ).ready(function() {
         // console.log("HERE");
         // console.log(event.data);
         json = JSON.parse(json)
+        console.log("This is json")
         console.log(json)
-        console.log("user: " + json.user);
-        console.log("move: " + json.move);
-        console.log(json.move);
-        moveJson =  json.move;
-
-       
+        if(typeof json.move != "undefined"){
+            console.log("this is json move: ")
+            console.log(json.move);
+            if(typeof json.move.id != "undefined"){
+                console.log("this is json id: ")
+                console.log(json.move.id);
+            }
+            if(typeof json.move.box != "undefined"){
+                console.log("this is json box: ")
+                console.log(json.move.box);
+            }
+            if(typeof json.move.player != "undefined"){
+                console.log("this is json player: ")
+                console.log(json.move.player);
+            }
+            if(typeof json.move.position != "undefined"){
+                console.log("this is json position: ")
+                console.log(json.move.position);
+            }
+        }
     });
 
-    connection.onmessage = function(e){
-        let didTheyMove = false
-        let nr = null;
-        let nc = null;
-        setTimeout(function(){ didTheyMove = otherPlayerMove(playerYou);
+    // connection.onmessage = function(e){
+    //     let didTheyMove = false
+    //     let nr = null;
+    //     let nc = null;
+    //     setTimeout(function(){ didTheyMove = otherPlayerMove(playerYou);
         
-            if(didTheyMove == true){
-            console.log("moveJSON: " + moveJson)
-                sliceID = moveJson.id.slice(1)
-                console.log("ID WITHOUT HASH: " + sliceID);
-               p = Board.getPieceByIDString(sliceID)
-               console.log("this was the piece obj")
-               console.log(p); 
-               nr = moveJson.box[0]
-               nc = moveJson.box[1]
-               console.log("NR NC: " + nr + "," + nc)
-               console.log(p.movePiece(nr, nc));
-            }
+    //         if(didTheyMove == true){
+    //         console.log("moveJSON: " + moveJson)
+    //             sliceID = moveJson.id.slice(1)
+    //             console.log("ID WITHOUT HASH: " + sliceID);
+    //            p = Board.getPieceByIDString(sliceID)
+    //            console.log("this was the piece obj")
+    //            console.log(p); 
+    //            nr = moveJson.box[0]
+    //            nc = moveJson.box[1]
+    //            console.log("NR NC: " + nr + "," + nc)
+    //            console.log(p.movePiece(nr, nc));
+    //         }
         
-        }, 1000);
+    //     }, 1000);
         
-     }
+    //  }
 
     
 
@@ -592,8 +586,8 @@ $( document ).ready(function() {
         let isPlayerTurn = ($(this).parent().attr("class") == "player" + Board.playerTurn); // single player
 
 
-        //if(isPlayerTurn == true ){
-        if(isPlayerTurn == true && playerYou == Board.playerTurn){
+        if(isPlayerTurn == true ){
+        // if(isPlayerTurn == true && playerYou == Board.playerTurn){
             $(this).toggleClass('highlight');
             $(this).siblings().removeClass('highlight');
 
@@ -702,22 +696,25 @@ $( document ).ready(function() {
     ///////////////////////// TAKE TURNS OVER WEB LOGIC.
     function otherPlayerMove(you){
 
-        if (jsonToMove(moveJson).player == you){
-            console.log("You made this move!")
-            console.log("this was the piece id: " + moveJson.id)
-            console.log("this was the target box: " + moveJson.box)
-            console.log("this was the piece orig pos: " + moveJson.position)
-            console.log("this was the movejson.player: " + moveJson.player)
-            return false
+        if(typeof moveJson != "undefined"){
 
-        }
-        else{
-            console.log("you did not make this move")
-            console.log("this was the piece id: " + moveJson.id)
-            console.log("this was the target box: " + moveJson.box)
-            console.log("this was the piece orig pos: " + moveJson.position)
-            console.log("this was the movejson.player: " + moveJson.player)
-            return true
+            if (jsonToMove(moveJson).player == you){
+                console.log("You made this move!")
+                console.log("this was the piece id: " + moveJson.id)
+                console.log("this was the target box: " + moveJson.box)
+                console.log("this was the piece orig pos: " + moveJson.position)
+                console.log("this was the movejson.player: " + moveJson.player)
+                return false
+
+            }
+            else{
+                console.log("you did not make this move")
+                console.log("this was the piece id: " + moveJson.id)
+                console.log("this was the target box: " + moveJson.box)
+                console.log("this was the piece orig pos: " + moveJson.position)
+                console.log("this was the movejson.player: " + moveJson.player)
+                return true
+            }
         }
         
     }
