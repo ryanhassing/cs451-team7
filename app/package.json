@@ -1,5 +1,6 @@
 {
   "name": "team-7-checkers",
+  "productName": "Team 7 Checkers",
   "version": "1.0.0",
   "license": "MIT",
   "description": "Checkers application for CS451",
@@ -21,43 +22,22 @@
       "email": "zz365@drexel.edu"
     }
   ],
-  "main": "./app/main.js",
-  "scripts": {
-    "postinstall": "electron-builder install-app-deps",
-    "start": "npm install && electron ./app",
-    "pack": "build --dir",
-    "dist": "build"
-  },
-  "build": {
-    "appId": "team-7-checkers",
-    "dmg": {
-      "contents": [
-        {
-          "x": 110,
-          "y": 150
-        },
-        {
-          "x": 240,
-          "y": 150,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ]
-    },
-    "win": {
-      "target": "NSIS",
-      "icon": "build/icon.ico"
-    }
-  },
-  "dependencies": {},
+  "main": "main.js",
   "devDependencies": {
     "electron": "latest",
-    "electron-builder": "latest"
+    "electron-packager": "^11.1.0",
+    "standard": "^11.0.0",
+    "ws": "^5.0.0"
+  },
+  "scripts": {
+    "start": "npm install && electron .",
+    "standardize": "standard --fix \"./*.js\" \"./assets/js/*.js\"",
+    "package-linux": "electron-packager . team-7-checkers --overwrite --asar=true --platform=linux --arch=x64 --prune=true --out=../release/",
+    "package-win": "electron-packager . team-7-checkers --overwrite --asar=true --platform=win32 --arch=ia32 --prune=true --out=../release",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --prune=true --out=../release"
+  },
+  "dependencies": {
+    "npm": "^5.7.1",
+    "electron": "latest"
   }
 }

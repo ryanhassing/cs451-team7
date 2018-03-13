@@ -4,10 +4,9 @@ const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
-require('electron-reload')(__dirname)
+// require('electron-reload')(__dirname)
 
-
-console.log('main.js executing');
+console.log('main.js executing')
 
 const path = require('path')
 const url = require('url')
@@ -16,40 +15,36 @@ const url = require('url')
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.c   
+// Some APIs can only be used after this event occurs.c
 app.on('ready', function () {
-    // Create the browser window.
+  // Create the browser window.
 
+  console.log('App is now ready')
+  mainWindow = new BrowserWindow({width: 1000, height: 700 })
 
-    console.log('App is now ready');
-    mainWindow = new BrowserWindow({width: 1000, height: 700,   })
-  
+  // and load the index.html of the app.
+  console.log('loading index.html into mainWindow')
+  mainWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'index.html'),
+    protocol: 'file:',
+    slashes: true
+  }))
 
+  // Open the DevTools.
+  // mainWindow.webContents.openDevTools()
 
-    // and load the index.html of the app.
-    console.log('loading index.html into mainWindow');
-    mainWindow.loadURL(url.format({
-      pathname: path.join(__dirname, 'index.html'),
-      protocol: 'file:',
-      slashes: true
-    }))
-  
-    // Open the DevTools.
-    // mainWindow.webContents.openDevTools()
-  
-    // Emitted when the window is closed.
-    mainWindow.on('closed', function () {
-      console.log('mainWinswo closed');
-      // Dereference the window object, usually you would store windows
-      // in an array if your app supports multi windows, this is the time
-      // when you should delete the corresponding element.
-      mainWindow = null
-    })
+  // Emitted when the window is closed.
+  mainWindow.on('closed', function () {
+    console.log('mainWinswo closed')
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
+    mainWindow = null
   })
-  
+})
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar

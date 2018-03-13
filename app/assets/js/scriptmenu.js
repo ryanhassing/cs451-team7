@@ -16,10 +16,7 @@
 //     $(document).on("click", "#restart-game", function(){
 //         Board.resetBoard(boardConfig);
 //     })
-    
 
-
-    
 //         $(document).on("click", "#playtemp", function(){
 
 //             var ipInput = "";
@@ -36,20 +33,13 @@
 //             connection.addEventListener('open', function(event) {
 //                 connection.send('Connected.');
 //             });
-            
+
 //             // log message
 //             connection.addEventListener('message', function(event) {
 //                 console.log('Message: ', event.data);
 //             });
-   
-        
 
 //         })
-
-
-       
-
-
 
 //     $("#fname").on('keyup', function() {
 //         console.log("sdsdsdsdsd")
@@ -60,8 +50,7 @@
 //         else{
 //             $("#playtemp").prop("disabled", false);
 //         }
-    
-        
+
 //     });
 
 //     $(document).on("click", "#cancel-join",function(){
