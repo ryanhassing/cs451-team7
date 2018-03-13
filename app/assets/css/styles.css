@@ -364,3 +364,11 @@ div#board .box {
 #maingamescreen > div.container > div.nav > div:nth-child(5){
 	margin-top: auto;
 }
+
+#p1-box > span{
+	color: rgb(230, 98, 80);
+}
+
+#p2-box > span{
+	color: rgb(87, 146, 156);
+}

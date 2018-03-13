@@ -3,7 +3,10 @@ $(document).ready(function () {
   var WebSocket = require('ws')
   var connection
   var moveJson
-  var playerYou = 1
+  var playerYou = 0
+  var url = 'ws://cs451team7server.herokuapp.com/checkers'
+  connection = new WebSocket(url)
+  var userCount = 0
 
   /// ///////////////////////MENU FUNCTIONS///////////////////////////////
 
@@ -11,8 +14,12 @@ $(document).ready(function () {
     remote.getCurrentWindow().close()
   })
   $(document).on('click', '#forfeit', function () {
+    let winner = playerYou == 1 ? 2 : 1;
+    $("#f-winner").text("Player " + winner + " wins!");
     $('#modal-screen').css('display', 'flex')
   })
+  //TODO: close connectioin when clicking leave
+  // didin't work when i tried connection.close()
   $(document).on('click', '.leave', function () {
     Board.resetBoard(boardConfig)
     $('#modal-screen').css('display', 'none')
@@ -20,19 +27,7 @@ $(document).ready(function () {
   $(document).on('click', '#restart-game', function () {
     Board.resetBoard(boardConfig)
   })
-
-  $(document).on('click', '#playtemp', function () {
-    var ipInput = ''
-
-    $('#mainmenuscreen > #modal-screen').css('display', 'none')
-    ipInput = $('#fname').val()
-
-    console.log('this is IPinput:' + ipInput)
-  })
-
-  var url = 'ws://cs451team7server.herokuapp.com/checkers'
-  connection = new WebSocket(url)
-
+  
   // connection opened
   connection.addEventListener('open', function (event) {
     // connection.send('{"msg" : "connected"}');
@@ -42,74 +37,73 @@ $(document).ready(function () {
   // log message
   connection.addEventListener('message', function (event) {
     // jsonToMove(event.data);
+    
     let json = event.data
-    // console.log("HERE");
-    // console.log(event.data);
     json = JSON.parse(json)
     console.log('This is json')
     console.log(json)
+    let jsonArray = [];
+    if(typeof json.user != 'undefined'){
+      userCount++;
+      console.log("this is user: ")
+      let userStr = json.user;
+      let userInt = parseInt(userStr.substring(4));
+      let pName = ""
+      console.log(userStr);
+      console.log(parseInt(userStr.substring(4)))
+      // if(userCount % 2 == 0){
+      //   playerYou = 1
+      // }
+      // else{
+      //   playerYou = 2
+      // }
+      // pName = "#p" + playerYou + "-box > span";
+      // $(pName).text(" (You!)")
+      // if(userCount == 2)
+    }
+     
+
+
     if (typeof json.move !== 'undefined') {
       console.log('this is json move: ')
       console.log(json.move)
       if (typeof json.move.id !== 'undefined') {
         console.log('this is json id: ')
         console.log(json.move.id)
+        jsonArray.push(json.move.id)
       }
       if (typeof json.move.box !== 'undefined') {
         console.log('this is json box: ')
         console.log(json.move.box)
+        jsonArray.push(json.move.box)
       }
       if (typeof json.move.player !== 'undefined') {
         console.log('this is json player: ')
         console.log(json.move.player)
+        jsonArray.push(json.move.player)
       }
       if (typeof json.move.position !== 'undefined') {
         console.log('this is json position: ')
         console.log(json.move.position)
+        jsonArray.push(json.move.position)
       }
+      if (typeof json.move.zeat !== 'undefined') {
+        console.log('this is json eat: ')
+        console.log(json.move.zeat)
+        jsonArray.push(json.move.zeat)
+      }
+      console.log("id no hash: ")
+      let otherPieceObj = Board.getPieceByIDString(jsonArray[0].substring(1));
+      let eatPieceObj = json.move.zeat === null ? null : Board.getPieceByIDString(json.move.zeat.substring(1))
+      let otherBoxPos = jsonArray[1]
+      console.log("target pos:" + otherBoxPos[0] +  otherBoxPos[1])
+      otherPieceObj.movePiece(otherBoxPos, eatPieceObj)
+
+      
     }
+    
   })
 
-  // connection.onmessage = function(e){
-  //     let didTheyMove = false
-  //     let nr = null;
-  //     let nc = null;
-  //     setTimeout(function(){ didTheyMove = otherPlayerMove(playerYou);
-
-  //         if(didTheyMove == true){
-  //         console.log("moveJSON: " + moveJson)
-  //             sliceID = moveJson.id.slice(1)
-  //             console.log("ID WITHOUT HASH: " + sliceID);
-  //            p = Board.getPieceByIDString(sliceID)
-  //            console.log("this was the piece obj")
-  //            console.log(p);
-  //            nr = moveJson.box[0]
-  //            nc = moveJson.box[1]
-  //            console.log("NR NC: " + nr + "," + nc)
-  //            console.log(p.movePiece(nr, nc));
-  //         }
-
-  //     }, 1000);
-
-  //  }
-
-  $('#fname').on('keyup', function () {
-    console.log('sdsdsdsdsd')
-    let val = 0
-    if ($('#fname').val().length == 0) {
-      $('#playtemp').prop('disabled', true)
-    } else {
-      $('#playtemp').prop('disabled', false)
-    }
-  })
-
-  $(document).on('click', '#cancel-join', function () {
-    $('#mainmenuscreen > #modal-screen').css('display', 'none')
-  })
-  $(document).on('click', '#join', function () {
-    $('#mainmenuscreen > #modal-screen').css('display', 'flex')
-    console.log('hello')
-  })
 
   /// ////////////////////////////////////////////////////
 
@@ -453,10 +447,12 @@ $(document).ready(function () {
       }
       return enemies
     },
-    this.movePiece = function (boxObjpos) {
+    this.movePiece = function (boxObjpos, eatPiece) {
+      console.log("move piece called")
       newPos = boxObjpos
       let moveJSON = null
       let originalPos = this.pos
+      let eatPieceID = eatPiece === null ? null : eatPiece.id;
 
       if (Board.isEmptyBox(newPos[0], newPos[1]) && !Board.isGameOver()) {
         Board.updateBoard(0, this.pos[0], this.pos[1])
@@ -471,21 +467,32 @@ $(document).ready(function () {
             this.kingSelf()
           }
         }
+        if(!(typeof eatPiece == "undefined" || eatPiece === null)){
+          $('.info-text').text('Player ' + Board.playerTurn + ' captures!')
+          Board.updateScore()
+          eatPiece.removeSelf();
+        }
         Board.changePlayer(Board.playerTurn)
         // Board.changeYou(playerYou); //TESTING PURPOSES ONLY
         Board.printBoard()
       } else {
+        console.log("move piece failed")
         return false
       }
 
-      moveJSON = JSON.stringify({'player': this.piecePlayer, 'id': this.id, 'position': originalPos, 'box': boxObjpos })
+      
+      moveJSON = JSON.stringify({'player': this.piecePlayer, 'id': this.id, 'position': originalPos, 'box': boxObjpos, 'zeat': eatPieceID })
       if (connection.readyState == 1) {
         connection.send(moveJSON)
         console.log(moveJSON)
       }
+      console.log("move piece sucess")
+      updateGameScreen()
+      $('.info-text').text('Player ' + Board.playerTurn + ' to move.')
       return true
     },
     this.moveNoVal = function (boxObjpos) {
+      console.log("moveNoValCalled")
       newPos = boxObjpos
       Board.updateBoard(0, this.pos[0], this.pos[1])
       this.pos = newPos // this is extremely important. update the position only after marking the orig pos with 0
@@ -607,24 +614,17 @@ $(document).ready(function () {
           // enemiesAround format: [[pieceObj, boxObj], [pieceObj, boxObj]]
           for (i = 0; i < enemiesAround.length; i++) {
             if (!(enemiesAround[i][1] == undefined) && '#' + boxIDString == enemiesAround[i][1].id) {
-              $('.info-text').text('Player ' + Board.playerTurn + ' captures!')
-              Board.updateScore()
-              // updateGameScreen();
-              console.log('Tally: 1 has ' + Board.p1Score + 'and 2 has ' + Board.p2Score)
-
-              pieceObj.movePiece(enemiesAround[i][1].pos)
-
-              updateGameScreen()
-              enemiesAround[i][0].removeSelf()
+              pieceObj.movePiece(enemiesAround[i][1].pos, enemiesAround[i][0])
             }
           }
         }
       }
       if (pieceObj.validateMoveByPlayer(boxObj) && pieceObj.validateMoveOneRowCol(boxObj)) {
-        pieceObj.movePiece(boxObj.pos)
+        console.log("undefined this is not eating")
+        pieceObj.movePiece(boxObj.pos, null)
 
-        updateGameScreen()
-        $('.info-text').text('Player ' + Board.playerTurn + ' to move.')
+        // updateGameScreen()
+        // $('.info-text').text('Player ' + Board.playerTurn + ' to move.')
       }
     }
   })
