@@ -34,11 +34,17 @@ $(document).ready(function () {
   $(document).on('click', '.leave', function () {
     Board.resetBoard(boardConfig)
     $('#modal-screen').css('display', 'none')
+
+    playerLeave = JSON.stringify({'playerLeave': playerYou})
+    connection.send(playerLeave)
+
     if (connection.readyState === WebSocket.OPEN) {
       connection.close();
       console.log("Connection closed.")
    }
    userCount = 0
+
+
   })
   $(document).on('click', '#restart-game', function () {
     Board.resetBoard(boardConfig)
@@ -120,8 +126,10 @@ $(document).ready(function () {
               $('#modal-screen').css('display', 'flex')
             }
           }
-
-
+        }
+        else if (typeof json.move.playerLeave != 'undefined') {
+          console.log('player ' + json.move.playerLeave + ' has left')
+          // redirect to main menu
         }
       }
     })
