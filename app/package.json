@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "npm": "^5.7.1",
-    "electron": "latest"
+    "electron": "latest",
+    "ws": "^5.0.0"
   }
 }
