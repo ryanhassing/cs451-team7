@@ -7,8 +7,27 @@ $(document).ready(function () {
   var url = 'ws://cs451team7server.herokuapp.com/checkers'
   connection = new WebSocket(url)
   var userCount = 0
+  var singlePlayer = false;
+
+  // const socketCloseListener = function(event) {
+  //   if (connection) {
+  //     console.error('Disconnected.');
+  //   }
+  //   connection = new WebSocket(url);
+  //   connection.addEventListener('open', socketOpenListener);
+  //   connection.addEventListener('message', socketMessageListener);
+  //   connection.addEventListener('close', socketCloseListener);
+  // };
+  
 
   /// ///////////////////////MENU FUNCTIONS///////////////////////////////
+
+  $(document).on('click', '#single-player', function () {
+    $('#modal-screen-wait').css('display', 'none')
+    singlePlayer = true;
+    $('.p-name').css("display", "none")
+
+  })
 
   $(document).on('click', '#exit', function () {
     remote.getCurrentWindow().close()
@@ -21,7 +40,7 @@ $(document).ready(function () {
   //TODO: close connectioin when clicking leave
   // didin't work when i tried connection.close()
   $(document).on('click', '.leave', function () {
-    Board.resetBoard(boardConfig)
+    Board.resetBoard(boardConfig) // doesn't set player 1 to move????
     $('#modal-screen').css('display', 'none')
   })
   $(document).on('click', '#restart-game', function () {
@@ -65,30 +84,38 @@ $(document).ready(function () {
 
     }
      
-    if (typeof json.move !== 'undefined') {
+    if (typeof json.move != 'undefined') {
       console.log('this is json move: ')
       console.log(json.move)
-      if (typeof json.move.id !== 'undefined') {
+      if(typeof json.move.me != 'undefined'){
+        console.log("this is json me")
+        console.log(json.move.me)
+        if(json.move.me == "true"){
+          $("#modal-screen-wait").css("display", "none")
+        }
+      }
+      else{
+      if (typeof json.move.id != 'undefined') {
         console.log('this is json id: ')
         console.log(json.move.id)
         jsonArray.push(json.move.id)
       }
-      if (typeof json.move.box !== 'undefined') {
+      if (typeof json.move.box != 'undefined') {
         console.log('this is json box: ')
         console.log(json.move.box)
         jsonArray.push(json.move.box)
       }
-      if (typeof json.move.player !== 'undefined') {
+      if (typeof json.move.player != 'undefined') {
         console.log('this is json player: ')
         console.log(json.move.player)
         jsonArray.push(json.move.player)
       }
-      if (typeof json.move.position !== 'undefined') {
+      if (typeof json.move.position != 'undefined') {
         console.log('this is json position: ')
         console.log(json.move.position)
         jsonArray.push(json.move.position)
       }
-      if (typeof json.move.zeat !== 'undefined') {
+      if (typeof json.move.zeat != 'undefined') {
         console.log('this is json eat: ')
         console.log(json.move.zeat)
         jsonArray.push(json.move.zeat)
@@ -99,6 +126,7 @@ $(document).ready(function () {
       let otherBoxPos = jsonArray[1]
       console.log("target pos:" + otherBoxPos[0] +  otherBoxPos[1])
       otherPieceObj.movePiece(otherBoxPos, eatPieceObj)
+    }
 
       
     }
@@ -120,6 +148,20 @@ $(document).ready(function () {
       }
       pName = "#p" + playerYou + "-box > span";
       $(pName).text(" (You!)") 
+    }
+    if(userCount == 2){
+      console.log("anotehr player joined!")
+      $("#modal-screen-wait").css("display", "none");
+      $(".p-name").css("display", "initial");
+      singlePlayer = false;
+
+      playerJoin = JSON.stringify({'me': "true"})
+      if (connection.readyState == 1) {
+        connection.send(playerJoin)
+        console.log(playerJoin)
+      }
+
+
     }
   }
 
@@ -295,9 +337,10 @@ $(document).ready(function () {
       this.p2Score = 0
       this.boxes = [],
       this.pieces = [],
-      // this.playerTurn = (Math.random() <= 0.5) ? 1 : 2;
+      this.playerTurn = 1;
       this.init()
       $('#maingamescreen').html($('#maingamescreen').data('old-state'))
+      setPlayers(playerYou) // still gives playerYou back
       console.log('resetBoard')
       this.printBoard()
     },
@@ -510,16 +553,6 @@ $(document).ready(function () {
       $('.info-text').text('Player ' + Board.playerTurn + ' to move.')
       return true
     },
-    this.moveNoVal = function (boxObjpos) {
-      console.log("moveNoValCalled")
-      newPos = boxObjpos
-      Board.updateBoard(0, this.pos[0], this.pos[1])
-      this.pos = newPos // this is extremely important. update the position only after marking the orig pos with 0
-      Board.updateBoard(Board.playerTurn, newPos[0], newPos[1])
-      $(id).css('top', posToCss[newPos[0]])
-      $(id).css('left', posToCss[newPos[1]])
-      // $(id).removeClass('highlight');
-    }
     this.kingSelf = function () {
       this.isKing = true
       $(id).addClass('king')
@@ -541,10 +574,14 @@ $(document).ready(function () {
   updateGameScreen()
   $('#maingamescreen').data('old-state', $('#maingamescreen').html()) // store the old html config for reset
 
-  function updateGameScreen () {
+  function updateGameScreen () {    
+    winner = Board.playerTurn == 1 ? 2 : 1
+
     if (Board.isGameOver()) {
-      $('.info-text').text('Game Over! Player ' + Board.playerTurn + ' wins the game!')
-      modal.css('display', 'flex')
+      console.log("the modal text should change")
+      // console.log('Player ' + winner + ' wins!')
+      $('#f-winner').text('Player ' + winner + ' wins!')
+      $('#modal-screen').css('display', 'flex')
     }
     console.log('is it game over?' + Board.isGameOver())
 
@@ -573,7 +610,8 @@ $(document).ready(function () {
     let enemiesAround = []
     let isPlayerTurn = ($(this).parent().attr('class') == 'player' + Board.playerTurn) // single player
 
-    if (isPlayerTurn == true) {
+    if ((isPlayerTurn == true && playerYou == Board.playerTurn) || (singlePlayer == true && isPlayerTurn == true)) {
+   //if (isPlayerTurn == true) {
       // if(isPlayerTurn == true && playerYou == Board.playerTurn){
       $(this).toggleClass('highlight')
       $(this).siblings().removeClass('highlight')

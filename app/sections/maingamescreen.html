@@ -1,31 +1,35 @@
 <template class="section-template">
     <section id="maingamescreen" class="wrapper">
-        <!-- <h1>You're in maingamescreen</h1>
-        <hr> -->
 
-
-                <!-- The Modal -->
         <div id="modal-screen" class="modal">
-
-            <!-- Modal content -->
             <div class="modal-content">
-                   
                 <div class="aligner">
-                
-                <p id="f-winner" class="newh1">Player whatever wins!</p>
-                <i class="fi-burst">
-                        <i class="fi-trophy"></i>
-                </i>
-                
-                <p>You both have to hit restart for a rematch. </p> 
-                <div>
-                <button id="restart-game" class="buttongame">Restart Game</button>
-                <button id="start-menu" class="buttongame leave" data-section="mainmenuscreen" href="#">Leave Game</button>
+                    <p id="f-winner" class="newh1">Player whatever wins!</p>
+                    <i class="fi-burst">
+                            <i class="fi-trophy"></i>
+                    </i>
+                    <p>You both have to hit restart for a rematch. </p> 
+                    <div>
+                        <button id="restart-game" class="buttongame">Restart Game</button>
+                        <button id="start-menu" class="buttongame leave" data-section="mainmenuscreen" href="#">Leave Game</button>
+                    </div>
+                </div>
             </div>
-            </div>
-            </div>
-        
         </div>
+
+        <div id="modal-screen-wait" class="modal" style="display:flex">
+                <div class="modal-content">
+                    <div class="aligner">
+                        <p  class="newh1">Waiting for another player....</p>
+                        <i class="fi-widget"></i>
+                        <p>We'll start the match as soon as another player joins!</p> 
+                        <div>
+                            <button id="single-player" class="buttongame">Play Single Player</button>
+                            <button id="start-menu" class="buttongame leave" data-section="mainmenuscreen" href="#">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         
         <div class="container">
             <div class="nav">

@@ -339,6 +339,21 @@ div#board .box {
 	
 }
 
+.modal-content > div > .fi-widget{
+    font-size: 40vmin;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 0;
+	color: lightgray;
+	animation: spin 2s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
 .aligner{
 	align-self: center;
     display: flex;
