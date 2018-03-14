@@ -5,27 +5,20 @@ $(document).ready(function () {
   var moveJson
   var playerYou = 0
   var url = 'ws://cs451team7server.herokuapp.com/checkers'
-  connection = new WebSocket(url)
   var userCount = 0
   var singlePlayer = false;
-
-  // const socketCloseListener = function(event) {
-  //   if (connection) {
-  //     console.error('Disconnected.');
-  //   }
-  //   connection = new WebSocket(url);
-  //   connection.addEventListener('open', socketOpenListener);
-  //   connection.addEventListener('message', socketMessageListener);
-  //   connection.addEventListener('close', socketCloseListener);
-  // };
-  
 
   /// ///////////////////////MENU FUNCTIONS///////////////////////////////
 
   $(document).on('click', '#single-player', function () {
     $('#modal-screen-wait').css('display', 'none')
     singlePlayer = true;
-    $('.p-name').css("display", "none")
+    $("#p1-box > span").css("display", "none")
+    $("#p2-box > span").css("display", "none")
+    if (connection.readyState === WebSocket.OPEN) {
+      connection.close();
+      console.log("Connection closed.")
+   }
 
   })
 
@@ -37,101 +30,91 @@ $(document).ready(function () {
     $("#f-winner").text("Player " + winner + " wins!");
     $('#modal-screen').css('display', 'flex')
   })
-  //TODO: close connectioin when clicking leave
-  // didin't work when i tried connection.close()
   $(document).on('click', '.leave', function () {
-    Board.resetBoard(boardConfig) // doesn't set player 1 to move????
+    Board.resetBoard(boardConfig) 
     $('#modal-screen').css('display', 'none')
+    if (connection.readyState === WebSocket.OPEN) {
+      connection.close();
+      console.log("Connection closed.")
+   }
+   userCount = 0
   })
   $(document).on('click', '#restart-game', function () {
     Board.resetBoard(boardConfig)
   })
-  
-  // connection opened
-  connection.addEventListener('open', function (event) {
-    // connection.send('{"msg" : "connected"}');
-    console.log('Connected to server')
-   
 
-  })
-
-  // log message
-  connection.addEventListener('message', function (event) {
-    // jsonToMove(event.data);
+  $(document).on('click', "#join", function(){
+    connection = new WebSocket(url)
+      // connection opened
+    connection.addEventListener('open', function (event) {
+      // connection.send('{"msg" : "connected"}');
+      console.log('Connected to server')
     
-    let json = event.data
-    json = JSON.parse(json)
-    console.log('This is json')
-    console.log(json)
-    let jsonArray = [];
-    if(typeof json.user != 'undefined'){
-      userCount++;
-      console.log("this is user: ")
-      let userStr = json.user;
-      let userInt = parseInt(userStr.substring(4));
-      console.log(userStr);
-      console.log(parseInt(userStr.substring(4)))
-      setPlayers(userInt)
-      // if(userCount % 2 == 0){
-      //   playerYou = 1
-      // }
-      // else{
-      //   playerYou = 2
-      // }
-      // pName = "#p" + playerYou + "-box > span";
-      // $(pName).text(" (You!)")
 
+    })
 
-    }
-     
-    if (typeof json.move != 'undefined') {
-      console.log('this is json move: ')
-      console.log(json.move)
-      if(typeof json.move.me != 'undefined'){
-        console.log("this is json me")
-        console.log(json.move.me)
-        if(json.move.me == "true"){
-          $("#modal-screen-wait").css("display", "none")
+    // log message
+    connection.addEventListener('message', function (event) {
+      // jsonToMove(event.data);
+      
+      let json = event.data
+      json = JSON.parse(json)
+      console.log('This is json')
+      console.log(json)
+      if(typeof json.user != 'undefined'){
+        userCount++;
+        console.log("this is user: ")
+        let userStr = json.user;
+        let userInt = parseInt(userStr.substring(4));
+        console.log(userStr);
+        console.log(parseInt(userStr.substring(4)))
+        setPlayers(userInt)
+      }
+      
+      if (typeof json.move != 'undefined') {
+        console.log('this is json move: ')
+        console.log(json.move)
+        if(typeof json.move.me != 'undefined'){
+          console.log("this is json me")
+          console.log(json.move.me)
+          if(json.move.me == "true"){
+            $("#modal-screen-wait").css("display", "none")
+          }
+        }
+        else{
+          if (typeof json.move.id != 'undefined') {
+            console.log('this is json id: ')
+            console.log(json.move.id)
+          }
+          if (typeof json.move.box != 'undefined') {
+            console.log('this is json box: ')
+            console.log(json.move.box)
+          }
+          if (typeof json.move.player != 'undefined') {
+            console.log('this is json player: ')
+            console.log(json.move.player)
+          }
+          if (typeof json.move.position != 'undefined') {
+            console.log('this is json position: ')
+            console.log(json.move.position)
+          }
+          if (typeof json.move.zeat != 'undefined') {
+            console.log('this is json eat: ')
+            console.log(json.move.zeat)
+          }
+          console.log("id no hash: ")
+          let otherPieceObj = Board.getPieceByIDString(json.move.id.substring(1));
+          let eatPieceObj = json.move.zeat === null ? null : Board.getPieceByIDString(json.move.zeat.substring(1))
+          let otherBoxPos = json.move.box
+          console.log("target pos:" + otherBoxPos[0] +  otherBoxPos[1])
+          otherPieceObj.movePiece(otherBoxPos, eatPieceObj)
         }
       }
-      else{
-      if (typeof json.move.id != 'undefined') {
-        console.log('this is json id: ')
-        console.log(json.move.id)
-        jsonArray.push(json.move.id)
-      }
-      if (typeof json.move.box != 'undefined') {
-        console.log('this is json box: ')
-        console.log(json.move.box)
-        jsonArray.push(json.move.box)
-      }
-      if (typeof json.move.player != 'undefined') {
-        console.log('this is json player: ')
-        console.log(json.move.player)
-        jsonArray.push(json.move.player)
-      }
-      if (typeof json.move.position != 'undefined') {
-        console.log('this is json position: ')
-        console.log(json.move.position)
-        jsonArray.push(json.move.position)
-      }
-      if (typeof json.move.zeat != 'undefined') {
-        console.log('this is json eat: ')
-        console.log(json.move.zeat)
-        jsonArray.push(json.move.zeat)
-      }
-      console.log("id no hash: ")
-      let otherPieceObj = Board.getPieceByIDString(jsonArray[0].substring(1));
-      let eatPieceObj = json.move.zeat === null ? null : Board.getPieceByIDString(json.move.zeat.substring(1))
-      let otherBoxPos = jsonArray[1]
-      console.log("target pos:" + otherBoxPos[0] +  otherBoxPos[1])
-      otherPieceObj.movePiece(otherBoxPos, eatPieceObj)
-    }
-
-      
-    }
-    
+    })
   })
+
+  
+
 
   function setPlayers(int){
     let pName = ""    
@@ -341,6 +324,9 @@ $(document).ready(function () {
       this.init()
       $('#maingamescreen').html($('#maingamescreen').data('old-state'))
       setPlayers(playerYou) // still gives playerYou back
+      // pName = "#p" + playerYou + "-box > span";
+      // $(pName).text(" (You!)") 
+      // setPlayers()
       console.log('resetBoard')
       this.printBoard()
     },

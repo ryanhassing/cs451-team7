@@ -32,6 +32,13 @@ body {
 	cursor: pointer;
 }
 
+.buttongame:hover{
+
+	background-color: lightgray;
+	
+
+}
+
 .buttongame:active, .buttongame.active {
 
 	box-shadow: none;
