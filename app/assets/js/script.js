@@ -29,9 +29,10 @@ $(document).ready(function () {
     let winner = playerYou == 1 ? 2 : 1;
     $("#f-winner").text("Player " + winner + " wins!");
     $('#modal-screen').css('display', 'flex')
+    sendGameOverJSON(winner)
   })
   $(document).on('click', '.leave', function () {
-    Board.resetBoard(boardConfig) 
+    Board.resetBoard(boardConfig)
     $('#modal-screen').css('display', 'none')
     if (connection.readyState === WebSocket.OPEN) {
       connection.close();
@@ -49,14 +50,14 @@ $(document).ready(function () {
     connection.addEventListener('open', function (event) {
       // connection.send('{"msg" : "connected"}');
       console.log('Connected to server')
-    
+
 
     })
 
     // log message
     connection.addEventListener('message', function (event) {
       // jsonToMove(event.data);
-      
+
       let json = event.data
       json = JSON.parse(json)
       console.log('This is json')
@@ -70,7 +71,7 @@ $(document).ready(function () {
         console.log(parseInt(userStr.substring(4)))
         setPlayers(userInt)
       }
-      
+
       if (typeof json.move != 'undefined') {
         console.log('this is json move: ')
         console.log(json.move)
@@ -81,7 +82,7 @@ $(document).ready(function () {
             $("#modal-screen-wait").css("display", "none")
           }
         }
-        else{
+        else if (typeof json.move.id != 'undefined') {
           if (typeof json.move.id != 'undefined') {
             console.log('this is json id: ')
             console.log(json.move.id)
@@ -109,15 +110,28 @@ $(document).ready(function () {
           console.log("target pos:" + otherBoxPos[0] +  otherBoxPos[1])
           otherPieceObj.movePiece(otherBoxPos, eatPieceObj)
         }
+        else if (typeof json.move.gameOver != 'undefined') {
+          if (typeof json.move.winner != 'undefined') {
+            console.log('this is winner: ')
+            console.log(json.move.winner)
+
+            if (playerYou == json.move.winner) {
+              $('#f-winner').text('Player ' + json.move.winner + ' wins!')
+              $('#modal-screen').css('display', 'flex')
+            }
+          }
+
+
+        }
       }
     })
   })
 
-  
+
 
 
   function setPlayers(int){
-    let pName = ""    
+    let pName = ""
     console.log("usercount: " + userCount)
     console.log("user number: " + int);
     if(userCount == 1){
@@ -130,7 +144,7 @@ $(document).ready(function () {
         console.log("you are p1")
       }
       pName = "#p" + playerYou + "-box > span";
-      $(pName).text(" (You!)") 
+      $(pName).text(" (You!)")
     }
     if(userCount == 2){
       console.log("anotehr player joined!")
@@ -170,6 +184,15 @@ $(document).ready(function () {
     [-1, 2, -1, 2, -1, 2, -1, 2],
     [2, -1, 2, -1, 2, -1, 2, -1]]
   // int. if yoy create the game, youre 1. if you join, youre 2. Depending on who you are, you cannot touch another anotehr person's move till you receive the moveJSON from the server.
+
+  function sendGameOverJSON(player) {
+    //moveJSON = JSON.stringify({'player': this.piecePlayer, 'id': this.id, 'position': originalPos, 'box': boxObjpos, 'zeat': eatPieceID })
+    gameOverJSON = JSON.stringify({'winner': player, 'gameOver': 'gameOver'})
+    if (connection.readyState == 1) {
+      connection.send(gameOverJSON)
+      console.log(gameOverJSON)
+    }
+  }
 
   function Board (boardConfig) {
     this.board = boardConfig
@@ -325,13 +348,15 @@ $(document).ready(function () {
       $('#maingamescreen').html($('#maingamescreen').data('old-state'))
       setPlayers(playerYou) // still gives playerYou back
       // pName = "#p" + playerYou + "-box > span";
-      // $(pName).text(" (You!)") 
+      // $(pName).text(" (You!)")
       // setPlayers()
       console.log('resetBoard')
       this.printBoard()
     },
     this.isGameOver = function () {
       if (this.p1Score == 12 || this.p2Score == 12) {
+        // send json
+
         return true
       }
       return false
@@ -528,7 +553,7 @@ $(document).ready(function () {
         return false
       }
 
-      
+
       moveJSON = JSON.stringify({'player': this.piecePlayer, 'id': this.id, 'position': originalPos, 'box': boxObjpos, 'zeat': eatPieceID })
       if (connection.readyState == 1) {
         connection.send(moveJSON)
@@ -560,7 +585,7 @@ $(document).ready(function () {
   updateGameScreen()
   $('#maingamescreen').data('old-state', $('#maingamescreen').html()) // store the old html config for reset
 
-  function updateGameScreen () {    
+  function updateGameScreen () {
     winner = Board.playerTurn == 1 ? 2 : 1
 
     if (Board.isGameOver()) {
@@ -568,6 +593,7 @@ $(document).ready(function () {
       // console.log('Player ' + winner + ' wins!')
       $('#f-winner').text('Player ' + winner + ' wins!')
       $('#modal-screen').css('display', 'flex')
+      sendGameOverJSON(winner)
     }
     console.log('is it game over?' + Board.isGameOver())
 
