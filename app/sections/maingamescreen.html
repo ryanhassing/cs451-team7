@@ -8,7 +8,7 @@
                     <i class="fi-burst">
                             <i class="fi-trophy"></i>
                     </i>
-                    <p>You both have to hit restart for a rematch. </p> 
+                    <p id="rematch-message">You both have to hit restart for a rematch.</p> 
                     <div>
                         
                         <button id="start-menu" class="buttongame leave" data-section="mainmenuscreen" href="#">Leave Game</button>
@@ -18,16 +18,28 @@
             </div>
         </div>
 
-        <div id="modal-screen-wait" class="modal" style="display:flex">
+        <div id="modal-screen-wait" class="modal" style="display:none">
                 <div class="modal-content">
                     <div class="aligner">
-                        <p  class="newh1">Waiting for another player....</p>
+                        <p  class="newh1">Waiting for another player...</p>
                         <i class="fi-widget"></i>
                         <p>We'll start the match as soon as another player joins!</p> 
                         <div>
                             
                             <button id="start-menu" class="buttongame leave" data-section="mainmenuscreen" href="#">Cancel</button>
                             <button id="single-player" class="buttongame">Play Single Player</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modal-screen-leave" class="modal" style="display:none">
+                <div class="modal-content">
+                    <div class="aligner">
+                        <p  class="newh1">Your opponent has left!</p>
+                        <i class="fi-dislike"></i>
+                        <p>You'll be taken to the main menu shortly...</p> 
+                        <div>
                         </div>
                     </div>
                 </div>
