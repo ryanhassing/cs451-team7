@@ -404,3 +404,10 @@ div#board .box {
 #p2-box > span{
 	color: rgb(87, 146, 156);
 }
+
+.menu-aligner > .release-tag{
+	flex-grow: 1;
+    margin-top: 54px;
+    margin-bottom: 0px;
+    color: gray;
+}
