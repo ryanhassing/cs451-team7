@@ -48,3 +48,8 @@ The colored bar on the game will indicate whose turn it is. If it is your turn, 
 At any point during the game, you can leave or forfeit.
 
 The game ends when one player loses all their pieces or forfeits. Then the endgame screen appears, indicating the victor. From there, you can exit to the main menu or offer a restart. If both players elect to restart, you will start a new game.
+
+## Static Analysis
+Static analysis is performed using [standard](https://github.com/standard/standard). To analyze and fix code,
+- `cd` to the `app/` directory.
+- `npm run standardize`.
