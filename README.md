@@ -10,4 +10,11 @@
 - Zara Zahimi
 
 ### The Project
-This is a simple multiplayer checkers app created using Electron. It runs on Windows, Mac, and Linux. To install, clone this repository and navigate to the `./app` directory. From there, type `npm run package-linux` to build on Linux, `npm run package-win` to build on Windows, or `npm run package-mac` to build on Mac. The executables will be located in the `./release` directory.
+This is a simple multiplayer checkers app created using Electron. It runs on Windows, Mac, and Linux.
+
+### How to Use
+#### From Executable
+Mac, Linux, and Windows executables come prepackaged when you clone this repository. Locations:
+- Mac: `./release/team-7-checkers-darwin-x64/team-7-checkers.app/Contents/MacOS/team-7-checkers`
+- Linux: `./release/team-7-checkers-linux-x64/team-7-checkers`
+- Windows: `./release/team-7-checkers-win32-ia32/team-7-checkers.exe`
