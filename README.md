@@ -17,6 +17,17 @@ This is a simple multiplayer checkers app created using Electron. It runs on Win
 
 ## How to Use
 ### Installation
+#### Precompiled
+Precompiled versions are available:
+- [Mac](https://drive.google.com/open?id=1VbGJKdSlR2j45Qwm4VktygPV31G1Dlla)
+- [Linux](https://drive.google.com/open?id=1NhTInxul6CTY1cdsF5DBcXBQdq4YubWP)
+- [Windows](https://drive.google.com/open?id=1Nlfy2CyNp1lbkJIeqW0_JO-pbxHPsDPE)
+
+Unzip and double-click on the executable to start the program.
+- Mac: `team-7-checkers-darwin-x64/team-7-checkers.app/Contents/MacOS/team-7-checkers`
+- Windows: `team-7-checkers-win32-ia32/team-7-checkers.exe`
+- Linux: `team-7-checkers-linux-x64/team-7-checkers`
+
 #### From Source
 Building the app from source will require the use of a bash shell.
 - `cd` to the `app/` directory.
