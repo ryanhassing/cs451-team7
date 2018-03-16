@@ -29,7 +29,7 @@ Unzip and double-click on the executable to start the program.
 - Linux: `team-7-checkers-linux-x64/team-7-checkers`
 
 #### From Source
-Building the app from source will require the use of a bash shell.
+Building the app from source will require the use of a shell.
 - `cd` to the `app/` directory.
 - Mac: `npm run package-mac`
 - Linux: `npm run package-linux`
