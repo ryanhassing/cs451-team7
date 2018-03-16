@@ -1,5 +1,8 @@
-# CS451 Term Project
+# team-7-checkers
+
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
+## Release 1.0
 
 ## Drexel University, Winter 2018, Team 7
 
@@ -14,17 +17,23 @@ This is a simple multiplayer checkers app created using Electron. It runs on Win
 
 ## How to Use
 ### Installation
-#### From Executable
-Mac, Linux, and Windows executables come prepackaged when you clone this repository. Locations:
-- Mac: `./release/team-7-checkers-darwin-x64.zip`
-- Linux: `./release/team-7-checkers-linux-x64.zip`
-- Windows: `./release/team-7-checkers-win32-ia32.zip`
-
-Unzip the folder and double-click on the executable inside to start the program.
-
 #### From Source
-If you want, you can build the app from source. This will require the use of a bash shell.
+Building the app from source will require the use of a bash shell.
 - `cd` to the `app/` directory.
 - Mac: `npm run package-mac`
 - Linux: `npm run package-linux`
 - Windows: `npm run package-win`
+- The executable will appear in the `release/` directory.
+- Double-click on the executable to start the program.
+  - Mac: `release/team-7-checkers-darwin-x64/team-7-checkers.app/Contents/MacOS/team-7-checkers`
+  - Windows: `release/team-7-checkers-win32-ia32/team-7-checkers.exe`
+  - Linux: `release/team-7-checkers-linux-x64/team-7-checkers`
+
+### Use
+Open the application and press the 'Play' button to search for a game. If there is another user online, you will be matched with them.
+
+The colored bar on the game will indicate whose turn it is. If it is your turn, click a piece and its destination to make a move.
+
+At any point during the game, you can leave or forfeit.
+
+The game ends when one player loses all their pieces or forfeits. Then the endgame screen appears, indicating the victor. From there, you can exit to the main menu or offer a restart. If both players elect to restart, you will start a new game.

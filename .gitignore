@@ -56,3 +56,6 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# Releases
+release/team-7-checkers-*
